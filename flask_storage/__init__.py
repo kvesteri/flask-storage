@@ -11,6 +11,9 @@ __all__ = (
     MockStorageFile,
     S3BotoStorage,
     S3BotoStorageFile,
+    'STORAGE_DRIVERS',
+    'get_default_storage_class',
+    'get_filesystem_storage_class',
 )
 
 
