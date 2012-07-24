@@ -9,6 +9,9 @@ class MockStorage(Storage):
 
     _files = {}
 
+    def __init__(self, folder_name=None):
+        self.folder_name = folder_name
+
     def _save(self, name, content):
         self._files[name] = content
         return name

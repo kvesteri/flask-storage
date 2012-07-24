@@ -1,0 +1,5 @@
+pytest>=2.2.4
+Flask>=0.7
+python-cloudfiles>=1.7.10
+flexmock>=0.9.6
+boto>=2.5.2
