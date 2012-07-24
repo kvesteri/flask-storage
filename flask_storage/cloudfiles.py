@@ -118,7 +118,12 @@ class CloudFilesStorage(Storage):
 class CloudFilesStorageFile(object):
     def __init__(self, storage, name):
         self._file = storage.container.get_object(name)
+        self._name = name
         self._pos = 0
+
+    @property
+    def name(self):
+        return self._name
 
     @property
     def size(self):

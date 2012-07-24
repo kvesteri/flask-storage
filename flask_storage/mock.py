@@ -7,14 +7,16 @@ class MockStorage(Storage):
     A mock storage class for testing
     """
 
-    _files = {}
-
     def __init__(self, folder_name=None):
         self.folder_name = folder_name
+        self._files = {}
 
     def _save(self, name, content):
-        self._files[name] = content
+        self._files[name] = str(content)
         return name
+
+    def _open(self, name, mode):
+        return MockStorageFile(self, name)
 
     def path(self, name):
         """
@@ -51,17 +53,18 @@ class MockStorage(Storage):
 class MockStorageFile(object):
     def __init__(self, storage, name):
         self._name = name
+        self._file = storage._files[name]
         self._pos = 0
 
     @property
     def size(self):
-        return self._file.size
+        return len(self._file)
 
     def read(self, size=None):
         if self._pos == self.size:
             return ''
         size = min(size, self.size - self._pos)
-        data = self._file.read(size=size or -1, offset=self._pos)
+        data = self._file[self._pos:self.size]
         self._pos += len(data)
         return data
 

@@ -1,13 +1,16 @@
-from .amazon import S3BotoStorage
-from .cloudfiles import CloudFilesStorage
+from .amazon import S3BotoStorage, S3BotoStorageFile
+from .cloudfiles import CloudFilesStorage, CloudFilesStorageFile
 from .filesystem import FileSystemStorage
-from .mock import MockStorage
+from .mock import MockStorage, MockStorageFile
 
 __all__ = (
     CloudFilesStorage,
+    CloudFilesStorageFile,
     FileSystemStorage,
     MockStorage,
+    MockStorageFile,
     S3BotoStorage,
+    S3BotoStorageFile,
 )
 
 

@@ -1,5 +1,5 @@
 from tests import TestCase
-from flask_storage import MockStorage
+from flask_storage import MockStorage, MockStorageFile
 
 
 class TestMockStorage(TestCase):
@@ -16,3 +16,23 @@ class TestMockStorage(TestCase):
         storage = MockStorage()
         storage.save('key', 1)
         assert storage.url('key') == 'url-key'
+
+    def test_open_returns_file_object(self):
+        storage = MockStorage()
+        storage.save('key', 1)
+        file_ = storage.open('key')
+        assert isinstance(file_, MockStorageFile)
+
+
+class TestMockStorageFile(TestCase):
+    def test_size_returns_the_associated_file_size(self):
+        storage = MockStorage('uploads')
+        storage.save('key', 123123)
+        file_ = storage.open('key')
+        assert file_.size == 6
+
+    def test_read_returns_file_contents(self):
+        storage = MockStorage('uploads')
+        storage.save('key', 123123)
+        file_ = storage.open('key')
+        assert file_.read() == '123123'
