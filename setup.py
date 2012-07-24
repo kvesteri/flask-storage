@@ -33,6 +33,8 @@ setup(
     platforms='any',
     install_requires=[
         'Flask>=0.7',
+        'boto>=2.5.2',
+        'python-cloudfiles>=1.7.10'
     ],
     cmdclass={'test': PyTest},
     classifiers=[
