@@ -14,10 +14,20 @@ __all__ = (
 )
 
 
+STORAGE_DRIVERS = {
+    'amazon': S3BotoStorage,
+    'cloudfiles': CloudFilesStorage,
+    'filesystem': FileSystemStorage,
+    'mock': MockStorage
+}
+
+
 def get_default_storage_class(app):
-    return {
-        'amazon': S3BotoStorage,
-        'cloudfiles': CloudFilesStorage,
-        'filesystem': FileSystemStorage,
-        'mock': MockStorage
-    }[app.config['DEFAULT_FILE_STORAGE']]
+    return STORAGE_DRIVERS[app.config['DEFAULT_FILE_STORAGE']]
+
+
+def get_filesystem_storage_class(app):
+    if app.config['TESTING']:
+        return MockStorage
+    else:
+        return FileSystemStorage
