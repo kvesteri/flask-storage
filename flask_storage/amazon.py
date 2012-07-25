@@ -7,42 +7,7 @@ from boto.s3.key import Key
 
 from flask import current_app
 
-from .base import Storage, StorageException, StorageFile, reraise
-
-
-def safe_join(base, *paths):
-    """
-    A version of django.utils._os.safe_join for S3 paths.
-
-    Joins one or more path components to the base path component
-    intelligently. Returns a normalized version of the final path.
-
-    The final path must be located inside of the base path component
-    (otherwise a ValueError is raised).
-
-    Paths outside the base path indicate a possible security
-    sensitive operation.
-    """
-    from urlparse import urljoin
-    #base_path = force_unicode(base)
-    base_path = unicode(base)
-    base_path = base_path.rstrip('/')
-    paths = [unicode(p) for p in paths]
-
-    final_path = base_path
-    for path in paths:
-        final_path = urljoin(final_path.rstrip('/') + "/", path.rstrip("/"))
-
-    # Ensure final_path starts with base_path and that the next character after
-    # the final path is '/' (or nothing, in which case final_path must be
-    # equal to base_path).
-    base_path_len = len(base_path)
-    if not final_path.startswith(base_path) \
-            or final_path[base_path_len:base_path_len + 1] not in ('', '/'):
-        raise ValueError('the joined path is located outside of the base path'
-                         ' component')
-
-    return final_path.lstrip('/')
+from .base import Storage, StorageException, StorageFile, reraise, safe_join
 
 
 class S3BotoStorage(Storage):
@@ -194,7 +159,7 @@ class S3BotoStorage(Storage):
         try:
             return safe_join(self.location, name)
         except ValueError:
-            raise RuntimeError("Attempted access to '%s' denied." % name)
+            raise StorageException("Attempted access to '%s' denied." % name)
 
     def _encode_name(self, name):
         return str(name)
@@ -277,35 +242,3 @@ class S3BotoStorageFile(StorageFile):
     @property
     def name(self):
         return self._key.name
-
-    @property
-    def url(self):
-        return self._storage.url(self._key.name)
-
-    def delete(self):
-        self._storage.delete(self._key.name)
-
-    @property
-    def size(self):
-        return self._file.size
-
-    def read(self, size=None):
-        if self._pos == self.size:
-            return ''
-        size = min(size, self.size - self._pos)
-        data = self._file.read(size=size or -1, offset=self._pos)
-        self._pos += len(data)
-        return data
-
-    def seek(self, offset, whence=os.SEEK_SET):
-        if whence == os.SEEK_SET:
-            self._pos = offset
-        elif whence == os.SEEK_CUR:
-            self._pos += offset
-        elif whence == os.SEEK_END:
-            self._pos = self.size + offset
-        else:
-            raise IOError(22, 'Invalid argument')
-
-    def tell(self):
-        return self._pos

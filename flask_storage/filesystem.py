@@ -4,7 +4,7 @@ import shutil
 import StringIO
 
 from flask import current_app, url_for
-from .base import Storage, StorageException, reraise as _reraise
+from .base import Storage, StorageException, reraise as _reraise, safe_join
 
 
 def reraise(exception):
@@ -88,7 +88,7 @@ class FileSystemStorage(Storage):
         return os.path.exists(self.path(name))
 
     def path(self, name):
-        return os.path.normpath(os.path.join(self.location, name))
+        return os.path.normpath(safe_join(self.location, name))
 
     def url(self, name):
         return url_for('uploads.uploaded_file', filename=name)

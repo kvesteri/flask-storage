@@ -20,6 +20,41 @@ def reraise(exception):
     raise StorageException(**kwargs)
 
 
+def safe_join(base, *paths):
+    """
+    A version of django.utils._os.safe_join for S3 paths.
+
+    Joins one or more path components to the base path component
+    intelligently. Returns a normalized version of the final path.
+
+    The final path must be located inside of the base path component
+    (otherwise a ValueError is raised).
+
+    Paths outside the base path indicate a possible security
+    sensitive operation.
+    """
+    from urlparse import urljoin
+    #base_path = force_unicode(base)
+    base_path = unicode(base)
+    base_path = base_path.rstrip('/')
+    paths = [unicode(p) for p in paths]
+
+    final_path = base_path
+    for path in paths:
+        final_path = urljoin(final_path.rstrip('/') + "/", path.rstrip("/"))
+
+    # Ensure final_path starts with base_path and that the next character after
+    # the final path is '/' (or nothing, in which case final_path must be
+    # equal to base_path).
+    base_path_len = len(base_path)
+    if not final_path.startswith(base_path) \
+            or final_path[base_path_len:base_path_len + 1] not in ('', '/'):
+        raise ValueError('the joined path is located outside of the base path'
+                         ' component')
+
+    return final_path.lstrip('/')
+
+
 class StorageException(Exception):
     def __init__(self, message='', status_code=None, wrapped_exception=None):
         self.status_code = status_code
@@ -50,7 +85,7 @@ class Storage(object):
         filename = os.path.normpath(secure_filename(os.path.basename(name)))
         if folder is not None:
             folder = os.path.normpath(folder)
-            name = os.path.join(folder, filename)
+            name = safe_join(folder, filename)
         else:
             name = filename
 
@@ -76,7 +111,7 @@ class Storage(object):
         while self.exists(name):
             # file_ext includes the dot.
             newname = "%s_%s%s" % (file_root, count.next(), file_ext)
-            name = os.path.join(dir_name, newname)
+            name = safe_join(dir_name, newname)
         return name
 
     def path(self, name):
@@ -132,6 +167,33 @@ class Storage(object):
         directly by a Web browser.
         """
         raise NotImplementedError
+
+    def _clean_name(self, name):
+        """
+        Cleans the name so that Windows style paths work
+        """
+        # Useful for windows' paths
+        return os.path.normpath(name).replace('\\', '/')
+
+    def _normalize_name(self, name):
+        """
+        Normalizes the name so that paths like
+        /path/to/ignored/../something.txt
+        work. We check to make sure that the path pointed to is not outside
+        the directory specified by the LOCATION setting.
+        """
+        try:
+            return safe_join(self.location, name)
+        except ValueError:
+            raise StorageException("Attempted access to '%s' denied." % name)
+
+    def _encode_name(self, name):
+        return str(name)
+        #return smart_str(name, encoding=self.file_name_charset)
+
+    def _decode_name(self, name):
+        return unicode(name)
+        #return force_unicode(name, encoding=self.file_name_charset)
 
 
 class StorageFile(object):
