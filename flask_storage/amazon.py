@@ -237,8 +237,16 @@ class S3BotoStorage(Storage):
     def _open(self, name, mode='rb'):
         return S3BotoStorageFile(self, name)
 
-    def delete(self):
+    def delete_folder(self, name=None):
+        if name is None:
+            name = self.folder_name
         self.bucket.delete()
+
+    def delete(self, name):
+        if self.bucket.lookup(name) is None:
+            raise StorageException(404)
+        name = self._normalize_name(self._clean_name(name))
+        self.bucket.delete_key(self._encode_name(name))
 
     def exists(self, name):
         name = self._normalize_name(self._clean_name(name))
@@ -277,10 +285,7 @@ class S3BotoStorageFile(object):
         return self._storage.url(self._key.name)
 
     def delete(self):
-        name = self._storage._normalize_name(
-            self._storage._clean_name(self._key.name)
-        )
-        self._storage.bucket.delete_key(self._storage._encode_name(name))
+        self._storage.delete(self._key.name)
 
     @property
     def size(self):

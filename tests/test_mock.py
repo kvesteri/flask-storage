@@ -1,11 +1,13 @@
+from pytest import raises
+
 from tests import TestCase
-from flask_storage import MockStorage, MockStorageFile
+from flask_storage import MockStorage, MockStorageFile, StorageException
 
 
 class TestMockStorage(TestCase):
     def setup_method(self, method):
         TestCase.setup_method(self, method)
-        MockStorage.files = {}
+        MockStorage._files = {}
 
     def test_assigns_folder_on_initialization(self):
         storage = MockStorage('uploads')
@@ -26,6 +28,12 @@ class TestMockStorage(TestCase):
         storage.save('key', 1)
         file_ = storage.open('key')
         assert isinstance(file_, MockStorageFile)
+
+    def test_delete_raises_exception_for_unknown_file(self):
+        storage = MockStorage()
+        print storage._files
+        with raises(StorageException):
+            storage.delete('key')
 
 
 class TestMockStorageFile(TestCase):

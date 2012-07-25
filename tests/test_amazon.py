@@ -1,11 +1,19 @@
+from pytest import raises
+
 from flexmock import flexmock
 from boto.s3.connection import S3Connection
 from tests import TestCase
-from flask_storage import S3BotoStorage, S3BotoStorageFile
+from flask_storage import S3BotoStorage, S3BotoStorageFile, StorageException
 
 
 class MockBucket(object):
     def set_acl(self, acl):
+        pass
+
+    def lookup(self, key):
+        return None
+
+    def delete_key(self, key):
         pass
 
 
@@ -30,6 +38,17 @@ class TestS3BotoStorage(TestCase):
             .with_args('some_folder') \
             .and_return(MockBucket())
         self.storage.create_folder('some_folder')
+
+    def test_delete_raises_exception_for_unknown_file(self):
+        flexmock(S3Connection) \
+            .should_receive('__init__') \
+            .and_return(None)
+        flexmock(S3Connection) \
+            .should_receive('get_bucket') \
+            .and_return(MockBucket())
+        storage = S3BotoStorage('some bucket')
+        with raises(StorageException):
+            storage.delete('key')
 
 
 class TestS3BotoStorageOpenFile(TestCase):

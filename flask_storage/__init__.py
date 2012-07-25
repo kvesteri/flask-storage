@@ -2,6 +2,7 @@ from .amazon import S3BotoStorage, S3BotoStorageFile
 from .cloudfiles import CloudFilesStorage, CloudFilesStorageFile
 from .filesystem import FileSystemStorage
 from .mock import MockStorage, MockStorageFile
+from .base import Storage, StorageException
 
 __all__ = (
     CloudFilesStorage,
@@ -11,6 +12,8 @@ __all__ = (
     MockStorageFile,
     S3BotoStorage,
     S3BotoStorageFile,
+    Storage,
+    StorageException,
     'STORAGE_DRIVERS',
     'get_default_storage_class',
     'get_filesystem_storage_class',

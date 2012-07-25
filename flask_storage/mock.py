@@ -1,5 +1,5 @@
 import os
-from .base import Storage
+from .base import Storage, StorageException
 
 
 class MockStorage(Storage):
@@ -29,8 +29,11 @@ class MockStorage(Storage):
         """
         Deletes the specified file from the storage system.
         """
-        if self.exists(name):
+        try:
             del self._files[name]
+        except KeyError:
+            print "joo"
+            raise StorageException(404)
 
     def exists(self, name):
         """
