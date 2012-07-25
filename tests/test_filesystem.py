@@ -97,10 +97,27 @@ class TestFileSystemListFiles(FileSystemTestCase):
 
 
 class TestFileSystemOpen(FileSystemTestCase):
+    def setup_method(self, method):
+        FileSystemTestCase.setup_method(self, method)
+        self.storage = FileSystemStorage(os.path.dirname(__file__))
+        self.file = 'some_file.txt'
+
+    def teardown_method(self, method):
+        FileSystemTestCase.teardown_method(self, method)
+        try:
+            self.storage.delete(self.file)
+        except StorageException:
+            pass
+
     def test_raises_exception_for_unknown_file(self):
-        storage = FileSystemStorage(os.path.dirname(__file__))
         with raises(StorageException):
-            storage.open('some_unknown_file', 'rb')
+            self.storage.open('some_unknown_file', 'rb')
+
+    def test_returns_file_object_on_success(self):
+        storage = FileSystemStorage(os.path.dirname(__file__))
+        storage.save(self.file, 'something')
+        file_ = storage.open(self.file, 'rb')
+        assert isinstance(file_, file)
 
 
 class TestFileSystemDelete(FileSystemTestCase):

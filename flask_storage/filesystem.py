@@ -75,29 +75,30 @@ class FileSystemStorage(Storage):
         return name
 
     def open(self, name, mode='rb'):
+        path = self.path(name)
         try:
-            open(name, mode)
+            return open(path, mode)
         except IOError, e:
             reraise(e)
 
     def delete_folder(self, name):
         path = self.path(name)
         try:
-            shutil.rmtree(path)
+            return shutil.rmtree(path)
         except OSError, e:
             reraise(e)
 
     def create_folder(self, name):
         path = self.path(name)
         try:
-            os.makedirs(path)
+            return os.makedirs(path)
         except OSError, e:
             reraise(e)
 
     def delete(self, name):
         name = self.path(name)
         try:
-            os.remove(name)
+            return os.remove(name)
         except OSError, e:
             reraise(e)
 
