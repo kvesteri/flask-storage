@@ -47,15 +47,15 @@ class TestFileSystemCreateFolder(FileSystemTestCase):
 
     def test_creates_folder_on_success(self):
         storage = FileSystemStorage(os.path.dirname(__file__))
-        assert not os.path.exists(self.rel_path)
-        storage.create_folder(self.rel_path)
+        assert not os.path.exists(self.path)
+        storage.create_folder(self.path)
         assert os.path.exists(self.path)
 
     def test_raises_exception_on_folder_conflict(self):
         storage = FileSystemStorage(os.path.dirname(__file__))
-        storage.create_folder(self.rel_path)
+        storage.create_folder(self.path)
         with raises(StorageException):
-            storage.create_folder(self.rel_path)
+            storage.create_folder(self.path)
 
     def test_raises_exception_on_file_conflict(self):
         storage = FileSystemStorage(os.path.dirname(__file__))
@@ -77,20 +77,20 @@ class TestFileSystemCreateFolder(FileSystemTestCase):
 class TestFileSystemDeleteFolder(FileSystemTestCase):
     def test_deletes_folder_on_success(self):
         storage = FileSystemStorage(os.path.dirname(__file__))
-        storage.create_folder(self.rel_path)
-        storage.delete_folder(self.rel_path)
-        assert not os.path.exists(self.rel_path)
+        storage.create_folder(self.path)
+        storage.delete_folder(self.path)
+        assert not os.path.exists(self.path)
 
     def test_raises_exception_if_folder_does_not_exist(self):
         storage = FileSystemStorage(os.path.dirname(__file__))
         with raises(StorageException):
-            storage.delete_folder(self.rel_path)
+            storage.delete_folder(self.path)
 
 
 class TestFileSystemListFolders(FileSystemTestCase):
     def test_returns_list_of_folders_on_success(self):
         storage = FileSystemStorage(os.path.dirname(__file__))
-        storage.create_folder('uploads')
+        storage.create_folder(self.path)
         assert 'uploads' in storage.list_folders()
 
 
