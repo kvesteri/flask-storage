@@ -1,8 +1,9 @@
 import os
 import shutil
+from pytest import raises
 
 from tests import TestCase
-from flask_storage import FileSystemStorage
+from flask_storage import FileSystemStorage, StorageException
 
 
 class TestFileSystemDefaults(TestCase):
@@ -24,3 +25,10 @@ class TestFileSystemCreateFolder(TestCase):
         storage = FileSystemStorage(os.path.dirname(__file__))
         storage.create_folder('uploads/images')
         assert os.path.exists('uploads/images')
+
+
+class TestFileSystemDelete(TestCase):
+    def test_raises_exception_for_unknown_file(self):
+        storage = FileSystemStorage(os.path.dirname(__file__))
+        with raises(StorageException):
+            storage.delete('some_unknown_file')

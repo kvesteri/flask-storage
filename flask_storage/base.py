@@ -7,9 +7,14 @@ from werkzeug.utils import secure_filename
 __all__ = ('Storage')
 
 
+def reraise(exception):
+    raise StorageException(exception.message, exception.status)
+
+
 class StorageException(Exception):
-    def __init__(self, status_code):
+    def __init__(self, message='', status_code=None):
         self.status_code = status_code
+        self.message = message
 
 
 class Storage(object):
@@ -117,3 +122,40 @@ class Storage(object):
         directly by a Web browser.
         """
         raise NotImplementedError
+
+
+class StorageFile(object):
+    """
+    Base class for driver file classes
+    """
+    @property
+    def url(self):
+        return self._storage.url(self._key.name)
+
+    def delete(self):
+        self._storage.delete(self._key.name)
+
+    @property
+    def size(self):
+        return self._file.size
+
+    def read(self, size=None):
+        if self._pos == self.size:
+            return ''
+        size = min(size, self.size - self._pos)
+        data = self._file.read(size=size or -1, offset=self._pos)
+        self._pos += len(data)
+        return data
+
+    def seek(self, offset, whence=os.SEEK_SET):
+        if whence == os.SEEK_SET:
+            self._pos = offset
+        elif whence == os.SEEK_CUR:
+            self._pos += offset
+        elif whence == os.SEEK_END:
+            self._pos = self.size + offset
+        else:
+            raise IOError(22, 'Invalid argument')
+
+    def tell(self):
+        return self._pos

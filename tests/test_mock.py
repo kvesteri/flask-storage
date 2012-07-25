@@ -31,7 +31,6 @@ class TestMockStorage(TestCase):
 
     def test_delete_raises_exception_for_unknown_file(self):
         storage = MockStorage()
-        print storage._files
         with raises(StorageException):
             storage.delete('key')
 

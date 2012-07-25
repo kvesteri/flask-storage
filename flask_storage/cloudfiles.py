@@ -1,13 +1,12 @@
 from __future__ import absolute_import
 
-import os
 import mimetypes
 import cloudfiles
 from cloudfiles.errors import NoSuchObject, ResponseError
 from flask import current_app
 from werkzeug.utils import cached_property
 
-from .base import Storage, StorageException
+from .base import Storage, StorageFile, reraise
 
 __all__ = ('CloudFilesStorage',)
 
@@ -94,7 +93,7 @@ class CloudFilesStorage(Storage):
         try:
             self.container.delete_object(name)
         except ResponseError as e:
-            raise StorageException(e.status)
+            reraise(e)
 
     def exists(self, name):
         """
@@ -118,12 +117,12 @@ class CloudFilesStorage(Storage):
         try:
             return self.container.get_object(name)
         except NoSuchObject as e:
-            raise StorageException(e.status)
+            reraise(e)
         except ResponseError as e:
-            raise StorageException(e.status)
+            reraise(e)
 
 
-class CloudFilesStorageFile(object):
+class CloudFilesStorageFile(StorageFile):
     def __init__(self, storage, name):
         self._file = storage.get_object(name)
         self._name = name
@@ -132,28 +131,3 @@ class CloudFilesStorageFile(object):
     @property
     def name(self):
         return self._name
-
-    @property
-    def size(self):
-        return self._file.size
-
-    def read(self, size=None):
-        if self._pos == self.size:
-            return ''
-        size = min(size, self.size - self._pos)
-        data = self._file.read(size=size or -1, offset=self._pos)
-        self._pos += len(data)
-        return data
-
-    def seek(self, offset, whence=os.SEEK_SET):
-        if whence == os.SEEK_SET:
-            self._pos = offset
-        elif whence == os.SEEK_CUR:
-            self._pos += offset
-        elif whence == os.SEEK_END:
-            self._pos = self.size + offset
-        else:
-            raise IOError(22, 'Invalid argument')
-
-    def tell(self):
-        return self._pos

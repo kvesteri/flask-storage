@@ -3,7 +3,7 @@ import os
 import shutil
 
 from flask import current_app, url_for
-from .base import Storage
+from .base import Storage, StorageException
 
 
 class FileSystemStorage(Storage):
@@ -42,31 +42,25 @@ class FileSystemStorage(Storage):
     def create_folder(self, folder=None):
         if folder is None:
             folder = self.folder_name
-        # Create any intermediate directories that do not exist.
-        # Note that there is a race between os.path.exists and os.makedirs:
-        # if os.makedirs fails with EEXIST, the directory was created
-        # concurrently, and we can continue normally. Refs #16082.
-        if not os.path.exists(folder):
-            try:
-                os.makedirs(folder)
-            except OSError, e:
-                if e.errno != errno.EEXIST:
-                    raise
+        try:
+            os.makedirs(folder)
+        except OSError, e:
+            if e.errno == errno.EEXIST:
+                StorageException('%s exists' % folder, 409)
         if not os.path.isdir(folder):
-            raise IOError("%s exists and is not a directory." % folder)
+            raise StorageException(
+                "%s exists and is not a directory." % folder
+            )
 
     def delete(self, name):
         name = self.path(name)
-        # If the file exists, delete it from the filesystem.
-        # Note that there is a race between os.path.exists and os.remove:
-        # if os.remove fails with ENOENT, the file was removed
-        # concurrently, and we can continue normally.
-        if os.path.exists(name):
-            try:
-                os.remove(name)
-            except OSError, e:
-                if e.errno != errno.ENOENT:
-                    raise
+        try:
+            os.remove(name)
+        except OSError, e:
+            if e.errno == errno.ENOENT:
+                raise StorageException('No such file', 404)
+            else:
+                raise StorageException()
 
     def exists(self, name):
         return os.path.exists(self.path(name))

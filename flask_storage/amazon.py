@@ -1,17 +1,13 @@
 import mimetypes
 import os
 
-try:
-    from boto.s3.connection import S3Connection, SubdomainCallingFormat
-    from boto.exception import S3ResponseError, S3CreateError
-    from boto.s3.key import Key
-except ImportError:
-    raise RuntimeError("Could not load Boto's S3 bindings.\n"
-                       "See http://code.google.com/p/boto/")
+from boto.s3.connection import S3Connection, SubdomainCallingFormat
+from boto.exception import S3ResponseError, S3CreateError
+from boto.s3.key import Key
 
 from flask import current_app
 
-from .base import Storage, StorageException
+from .base import Storage, StorageException, StorageFile, reraise
 
 
 def safe_join(base, *paths):
@@ -160,7 +156,7 @@ class S3BotoStorage(Storage):
             bucket = self.connection.create_bucket(name)
             bucket.set_acl(self.bucket_acl)
         except S3CreateError as e:
-            raise StorageException(e.status)
+            reraise(e)
         return bucket
 
     def _get_or_create_bucket(self, name):
@@ -246,7 +242,7 @@ class S3BotoStorage(Storage):
         name = self._encode_name(self._normalize_name(self._clean_name(name)))
 
         if self.bucket.lookup(name) is None:
-            raise StorageException(404)
+            raise StorageException('%s already exists' % name, 404)
 
         self.bucket.delete_key(name)
 
@@ -270,7 +266,7 @@ class S3BotoStorage(Storage):
         )
 
 
-class S3BotoStorageFile(object):
+class S3BotoStorageFile(StorageFile):
     def __init__(self, storage, name):
         self._storage = storage
         self._key = Key(storage.bucket)
