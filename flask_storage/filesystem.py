@@ -88,8 +88,7 @@ class FileSystemStorage(Storage):
         except OSError, e:
             reraise(e)
 
-    def create_folder(self, name):
-        path = self.path(name)
+    def create_folder(self, path):
         try:
             return os.makedirs(path)
         except OSError, e:
