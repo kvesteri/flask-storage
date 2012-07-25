@@ -90,6 +90,12 @@ class TestFileSystemListFolders(FileSystemTestCase):
         assert 'uploads' in storage.list_folders()
 
 
+class TestFileSystemListFiles(FileSystemTestCase):
+    def test_returns_list_of_files_on_success(self):
+        storage = FileSystemStorage(os.path.dirname(__file__))
+        assert os.path.basename(__file__) in storage.list_files()
+
+
 class TestFileSystemOpen(FileSystemTestCase):
     def test_raises_exception_for_unknown_file(self):
         storage = FileSystemStorage(os.path.dirname(__file__))

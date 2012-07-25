@@ -16,6 +16,9 @@ class MockBucket(object):
     def delete_key(self, key):
         pass
 
+    def list(self):
+        return []
+
 
 class TestS3BotoStorage(TestCase):
     def setup_method(self, method):
@@ -49,6 +52,16 @@ class TestS3BotoStorage(TestCase):
         storage = S3BotoStorage('some bucket')
         with raises(StorageException):
             storage.delete('key')
+
+    def test_list_files_returns_list_of_key_names(self):
+        flexmock(S3Connection) \
+            .should_receive('__init__') \
+            .and_return(None)
+        flexmock(S3Connection) \
+            .should_receive('get_bucket') \
+            .and_return(MockBucket())
+        storage = S3BotoStorage('some bucket')
+        assert storage.list_files() == []
 
 
 class TestS3BotoStorageOpenFile(TestCase):

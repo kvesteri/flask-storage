@@ -42,6 +42,14 @@ class FileSystemStorage(Storage):
             os.listdir(self._absolute_path)
         )
 
+    def list_files(self):
+        if not self._absolute_path:
+            raise StorageException('No folder given in class constructor.')
+        return filter(
+            lambda a: not os.path.isdir(os.path.join(self._absolute_path, a)),
+            os.listdir(self._absolute_path)
+        )
+
     def _save(self, name, content):
         full_path = self.path(name)
         directory = os.path.dirname(full_path)

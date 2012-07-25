@@ -107,8 +107,7 @@ class S3BotoStorage(Storage):
     def folder(self):
         return self.bucket
 
-    @property
-    def files(self):
+    def list_files(self):
         return [
             S3BotoStorageFile(self, key.name) for key in self.bucket.list()
         ]
