@@ -27,19 +27,20 @@ class FileSystemStorage(Storage):
                 'UPLOADS_FOLDER',
                 os.path.dirname(__file__)
             )
-        self.folder_name = os.path.abspath(folder_name)
-
-    def list_folders(self):
-        if not self.folder_name:
-            raise StorageException('No folder given in class constructor.')
-        return filter(
-            lambda a: os.path.isdir(os.path.join(self.folder_name, a)),
-            os.listdir(self.folder_name)
-        )
+        self._folder_name = folder_name
+        self._absolute_path = os.path.abspath(folder_name)
 
     @property
-    def location(self):
-        return self.folder_name
+    def folder_name(self):
+        return self._folder_name
+
+    def list_folders(self):
+        if not self._absolute_path:
+            raise StorageException('No folder given in class constructor.')
+        return filter(
+            lambda a: os.path.isdir(os.path.join(self._absolute_path, a)),
+            os.listdir(self._absolute_path)
+        )
 
     def _save(self, name, content):
         full_path = self.path(name)
@@ -96,7 +97,7 @@ class FileSystemStorage(Storage):
         return os.path.exists(self.path(name))
 
     def path(self, name):
-        return os.path.normpath(os.path.join(self.location, name))
+        return os.path.normpath(os.path.join(self._absolute_path, name))
 
     def url(self, name):
         return url_for('uploads.uploaded_file', filename=name)

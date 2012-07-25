@@ -1,5 +1,4 @@
 import mimetypes
-import os
 
 from boto.s3.connection import S3Connection, SubdomainCallingFormat
 from boto.exception import S3ResponseError, S3CreateError
@@ -7,7 +6,7 @@ from boto.s3.key import Key
 
 from flask import current_app
 
-from .base import Storage, StorageException, StorageFile, reraise, safe_join
+from .base import Storage, StorageException, StorageFile, reraise
 
 
 class S3BotoStorage(Storage):
@@ -102,7 +101,7 @@ class S3BotoStorage(Storage):
         return self._bucket
 
     def list_folders(self):
-        return self.connection.get_all_buckets()
+        return [bucket.name for bucket in self.connection.get_all_buckets()]
 
     @property
     def folder(self):
