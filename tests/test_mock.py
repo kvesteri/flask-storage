@@ -3,6 +3,10 @@ from flask_storage import MockStorage, MockStorageFile
 
 
 class TestMockStorage(TestCase):
+    def setup_method(self, method):
+        TestCase.setup_method(self, method)
+        MockStorage.files = {}
+
     def test_assigns_folder_on_initialization(self):
         storage = MockStorage('uploads')
         assert storage.folder_name == 'uploads'
@@ -25,6 +29,10 @@ class TestMockStorage(TestCase):
 
 
 class TestMockStorageFile(TestCase):
+    def setup_method(self, method):
+        TestCase.setup_method(self, method)
+        MockStorage._files = {}
+
     def test_size_returns_the_associated_file_size(self):
         storage = MockStorage('uploads')
         storage.save('key', 123123)

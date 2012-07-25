@@ -6,10 +6,10 @@ class MockStorage(Storage):
     """
     A mock storage class for testing
     """
+    _files = {}
 
     def __init__(self, folder_name=None):
         self.folder_name = folder_name
-        self._files = {}
 
     def _save(self, name, content):
         self._files[name] = str(content)
