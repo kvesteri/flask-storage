@@ -14,30 +14,44 @@ class FileSystemTestCase(TestCase):
             'uploads',
             'images'
         )
+        self.rel_path = os.path.join('uploads', 'images')
 
     def teardown_method(self, method):
-        shutil.rmtree(self.path, ignore_errors=True)
+        shutil.rmtree(os.path.join(
+            os.path.dirname(__file__),
+            'uploads'
+        ), ignore_errors=True)
 
 
 class TestFileSystemDefaults(FileSystemTestCase):
     def test_if_folder_not_set_uses_application_config_default(self):
         self.app.config['UPLOADS_FOLDER'] = self.path
         storage = FileSystemStorage()
-        assert 'uploads/images' in storage.folder_name
+        assert self.rel_path in storage.folder_name
 
 
 class TestFileSystemCreateFolder(FileSystemTestCase):
+    def teardown_method(self, method):
+        FileSystemTestCase.teardown_method(self, method)
+        try:
+            os.remove(os.path.join(
+                os.path.dirname(__file__),
+                'uploads')
+            )
+        except OSError:
+            pass
+
     def test_creates_folder_on_success(self):
         storage = FileSystemStorage(os.path.dirname(__file__))
-        assert not os.path.exists('uploads/images')
-        storage.create_folder('uploads/images')
+        assert not os.path.exists(self.rel_path)
+        storage.create_folder(self.rel_path)
         assert os.path.exists(self.path)
 
     def test_raises_exception_on_folder_conflict(self):
         storage = FileSystemStorage(os.path.dirname(__file__))
-        storage.create_folder('uploads/images')
+        storage.create_folder(self.rel_path)
         with raises(StorageException):
-            storage.create_folder('uploads/images')
+            storage.create_folder(self.rel_path)
 
     def test_raises_exception_on_file_conflict(self):
         storage = FileSystemStorage(os.path.dirname(__file__))
@@ -59,14 +73,14 @@ class TestFileSystemCreateFolder(FileSystemTestCase):
 class TestFileSystemDeleteFolder(FileSystemTestCase):
     def test_deletes_folder_on_success(self):
         storage = FileSystemStorage(os.path.dirname(__file__))
-        storage.create_folder('uploads/images')
-        storage.delete_folder('uploads/images')
-        assert not os.path.exists('uploads/images')
+        storage.create_folder(self.rel_path)
+        storage.delete_folder(self.rel_path)
+        assert not os.path.exists(self.rel_path)
 
     def test_raises_exception_if_folder_does_not_exist(self):
         storage = FileSystemStorage(os.path.dirname(__file__))
         with raises(StorageException):
-            storage.delete_folder('uploads/images')
+            storage.delete_folder(self.rel_path)
 
 
 class TestFileSystemDelete(FileSystemTestCase):

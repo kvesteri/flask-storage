@@ -14,7 +14,7 @@ def reraise(exception):
     }
     # cloudfiles and S3Boto exceptions have http compatible status codes we
     # need to assign them to StorageException
-    if exception.status:
+    if hasattr(exception, 'status'):
         kwargs['status_code'] = exception.status
 
     raise StorageException(**kwargs)
