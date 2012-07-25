@@ -8,13 +8,23 @@ __all__ = ('Storage')
 
 
 def reraise(exception):
-    raise StorageException(exception.message, exception.status)
+    kwargs = {
+        'message': exception.message,
+        'wrapped_exception': exception
+    }
+    # cloudfiles and S3Boto exceptions have http compatible status codes we
+    # need to assign them to StorageException
+    if exception.status:
+        kwargs['status_code'] = exception.status
+
+    raise StorageException(**kwargs)
 
 
 class StorageException(Exception):
-    def __init__(self, message='', status_code=None):
+    def __init__(self, message='', status_code=None, wrapped_exception=None):
         self.status_code = status_code
         self.message = message
+        self.wrapped_exception = wrapped_exception
 
 
 class Storage(object):

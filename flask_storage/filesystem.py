@@ -1,9 +1,19 @@
 import errno
 import os
 import shutil
+import StringIO
 
 from flask import current_app, url_for
-from .base import Storage, StorageException
+from .base import Storage, StorageException, reraise as _reraise
+
+
+def reraise(exception):
+    if exception.errno == errno.EEXIST:
+        exception.status = 409
+    elif exception.errno == errno.ENOENT:
+        exception.status = 404
+    exception.message = exception.strerror
+    _reraise(exception)
 
 
 class FileSystemStorage(Storage):
@@ -26,41 +36,47 @@ class FileSystemStorage(Storage):
     def _save(self, name, content):
         full_path = self.path(name)
         directory = os.path.dirname(full_path)
-        self.create_folder(directory)
+        try:
+            self.create_folder(directory)
+        except StorageException, e:
+            if e.status_code != 409:
+                raise e
 
         with open(full_path, 'wb') as destination:
             buffer_size = 16384
-            shutil.copyfileobj(content, destination, buffer_size)
+            # we should allow strings to be passed as content since the other
+            # drivers support this too
+            if isinstance(content, basestring):
+                io = StringIO.StringIO()
+                io.write(content)
+                content = io
 
+            try:
+                shutil.copyfileobj(content, destination, buffer_size)
+            except OSError, e:
+                reraise(e)
         return name
 
-    def delete_folder(self, folder=None):
-        if folder is None:
-            folder = self.folder_name
-        shutil.rmtree(folder)
-
-    def create_folder(self, folder=None):
-        if folder is None:
-            folder = self.folder_name
+    def delete_folder(self, name):
+        path = self.path(name)
         try:
-            os.makedirs(folder)
+            shutil.rmtree(path)
         except OSError, e:
-            if e.errno == errno.EEXIST:
-                StorageException('%s exists' % folder, 409)
-        if not os.path.isdir(folder):
-            raise StorageException(
-                "%s exists and is not a directory." % folder
-            )
+            reraise(e)
+
+    def create_folder(self, name):
+        path = self.path(name)
+        try:
+            os.makedirs(path)
+        except OSError, e:
+            reraise(e)
 
     def delete(self, name):
         name = self.path(name)
         try:
             os.remove(name)
         except OSError, e:
-            if e.errno == errno.ENOENT:
-                raise StorageException('No such file', 404)
-            else:
-                raise StorageException()
+            reraise(e)
 
     def exists(self, name):
         return os.path.exists(self.path(name))
