@@ -3,7 +3,11 @@ import shutil
 from pytest import raises
 
 from tests import TestCase
-from flask_storage import FileSystemStorage, StorageException
+from flask_storage import (
+    FileSystemStorage,
+    FileSystemStorageFile,
+    StorageException
+)
 
 
 class FileSystemTestCase(TestCase):
@@ -117,7 +121,7 @@ class TestFileSystemOpen(FileSystemTestCase):
         storage = FileSystemStorage(os.path.dirname(__file__))
         storage.save(self.file, 'something')
         file_ = storage.open(self.file, 'rb')
-        assert isinstance(file_, file)
+        assert isinstance(file_, FileSystemStorageFile)
 
 
 class TestFileSystemDelete(FileSystemTestCase):

@@ -77,7 +77,7 @@ class FileSystemStorage(Storage):
     def open(self, name, mode='rb'):
         path = self.path(name)
         try:
-            return open(path, mode)
+            return FileSystemStorageFile(open(path, mode))
         except IOError, e:
             reraise(e)
 
@@ -110,3 +110,15 @@ class FileSystemStorage(Storage):
 
     def url(self, name):
         return url_for('uploads.uploaded_file', filename=name)
+
+
+class FileSystemStorageFile(object):
+    def __init__(self, file_):
+        self.decorated = file_
+
+    @property
+    def name(self):
+        return os.path.basename(self.decorated.name)
+
+    def __getattr__(self, name):
+        return getattr(self.decorated, name)

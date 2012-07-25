@@ -1,6 +1,6 @@
 from .amazon import S3BotoStorage, S3BotoStorageFile
 from .cloudfiles import CloudFilesStorage, CloudFilesStorageFile
-from .filesystem import FileSystemStorage
+from .filesystem import FileSystemStorage, FileSystemStorageFile
 from .mock import MockStorage, MockStorageFile
 from .base import Storage, StorageException
 
@@ -8,6 +8,7 @@ __all__ = (
     CloudFilesStorage,
     CloudFilesStorageFile,
     FileSystemStorage,
+    FileSystemStorageFile,
     MockStorage,
     MockStorageFile,
     S3BotoStorage,
