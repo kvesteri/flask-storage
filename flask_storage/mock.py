@@ -32,7 +32,6 @@ class MockStorage(Storage):
         try:
             del self._files[name]
         except KeyError:
-            print "joo"
             raise StorageException(404)
 
     def exists(self, name):

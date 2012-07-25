@@ -62,7 +62,6 @@ class Storage(object):
             # file_ext includes the dot.
             newname = "%s_%s%s" % (file_root, count.next(), file_ext)
             name = os.path.join(dir_name, newname)
-
         return name
 
     def path(self, name):

@@ -3,10 +3,11 @@ from __future__ import absolute_import
 import os
 import mimetypes
 import cloudfiles
+from cloudfiles.errors import NoSuchObject, ResponseError
 from flask import current_app
 from werkzeug.utils import cached_property
 
-from .base import Storage
+from .base import Storage, StorageException
 
 __all__ = ('CloudFilesStorage',)
 
@@ -20,10 +21,12 @@ class CloudFilesStorage(Storage):
         """
         Initialize the settings for the connection and container.
         """
-        self.username = username or current_app.config['CLOUDFILES_USERNAME']
-        self.api_key = api_key or current_app.config['CLOUDFILES_API_KEY']
+        self.username = username or current_app.config.get(
+            'CLOUDFILES_USERNAME', None)
+        self.api_key = api_key or current_app.config.get(
+            'CLOUDFILES_API_KEY', None)
         self.container_name = folder_name or \
-            current_app.config['CLOUDFILES_CONTAINER']
+            current_app.config.get('CLOUDFILES_CONTAINER', None)
         self.timeout = timeout or current_app.config.get(
             'CLOUDFILES_TIMEOUT', 5)
         self.use_servicenet = current_app.config.get(
@@ -90,11 +93,8 @@ class CloudFilesStorage(Storage):
         """
         try:
             self.container.delete_object(name)
-        except cloudfiles.errors.ResponseError, exc:
-            if exc.status == 404:
-                pass
-            else:
-                raise
+        except ResponseError as e:
+            raise StorageException(e.status)
 
     def exists(self, name):
         """
@@ -104,7 +104,7 @@ class CloudFilesStorage(Storage):
         try:
             self.container.get_object(name)
             return True
-        except cloudfiles.errors.NoSuchObject:
+        except NoSuchObject:
             return False
 
     def url(self, name):
@@ -114,10 +114,18 @@ class CloudFilesStorage(Storage):
         """
         return '%s/%s' % (self.container_url, name)
 
+    def get_object(self, name):
+        try:
+            return self.container.get_object(name)
+        except NoSuchObject as e:
+            raise StorageException(e.status)
+        except ResponseError as e:
+            raise StorageException(e.status)
+
 
 class CloudFilesStorageFile(object):
     def __init__(self, storage, name):
-        self._file = storage.container.get_object(name)
+        self._file = storage.get_object(name)
         self._name = name
         self._pos = 0
 

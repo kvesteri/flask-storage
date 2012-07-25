@@ -243,10 +243,12 @@ class S3BotoStorage(Storage):
         self.bucket.delete()
 
     def delete(self, name):
+        name = self._encode_name(self._normalize_name(self._clean_name(name)))
+
         if self.bucket.lookup(name) is None:
             raise StorageException(404)
-        name = self._normalize_name(self._clean_name(name))
-        self.bucket.delete_key(self._encode_name(name))
+
+        self.bucket.delete_key(name)
 
     def exists(self, name):
         name = self._normalize_name(self._clean_name(name))
