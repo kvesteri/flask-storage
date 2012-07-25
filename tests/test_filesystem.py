@@ -83,6 +83,13 @@ class TestFileSystemDeleteFolder(FileSystemTestCase):
             storage.delete_folder(self.rel_path)
 
 
+class TestFileSystemOpen(FileSystemTestCase):
+    def test_raises_exception_for_unknown_file(self):
+        storage = FileSystemStorage(os.path.dirname(__file__))
+        with raises(StorageException):
+            storage.open('some_unknown_file', 'rb')
+
+
 class TestFileSystemDelete(FileSystemTestCase):
     def test_raises_exception_for_unknown_file(self):
         storage = FileSystemStorage(os.path.dirname(__file__))

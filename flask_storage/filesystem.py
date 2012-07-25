@@ -57,6 +57,12 @@ class FileSystemStorage(Storage):
                 reraise(e)
         return name
 
+    def open(self, name, mode='rb'):
+        try:
+            open(name, mode)
+        except IOError, e:
+            reraise(e)
+
     def delete_folder(self, name):
         path = self.path(name)
         try:
