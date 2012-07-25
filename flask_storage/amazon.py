@@ -101,7 +101,7 @@ class S3BotoStorage(Storage):
             self._bucket = self._get_or_create_bucket(self.bucket_name)
         return self._bucket
 
-    def get_all_folders(self):
+    def list_folders(self):
         return self.connection.get_all_buckets()
 
     @property
@@ -141,33 +141,6 @@ class S3BotoStorage(Storage):
                 "S3_BUCKET_NAME does not exist. "
                 "Buckets can be automatically created by setting "
                 "AWS_AUTO_CREATE_BUCKET=True")
-
-    def _clean_name(self, name):
-        """
-        Cleans the name so that Windows style paths work
-        """
-        # Useful for windows' paths
-        return os.path.normpath(name).replace('\\', '/')
-
-    def _normalize_name(self, name):
-        """
-        Normalizes the name so that paths like
-        /path/to/ignored/../something.txt
-        work. We check to make sure that the path pointed to is not outside
-        the directory specified by the LOCATION setting.
-        """
-        try:
-            return safe_join(self.location, name)
-        except ValueError:
-            raise StorageException("Attempted access to '%s' denied." % name)
-
-    def _encode_name(self, name):
-        return str(name)
-        #return smart_str(name, encoding=self.file_name_charset)
-
-    def _decode_name(self, name):
-        return unicode(name)
-        #return force_unicode(name, encoding=self.file_name_charset)
 
     def _save(self, name, content):
         cleaned_name = self._clean_name(name)

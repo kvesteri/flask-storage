@@ -4,7 +4,7 @@ import shutil
 import StringIO
 
 from flask import current_app, url_for
-from .base import Storage, StorageException, reraise as _reraise, safe_join
+from .base import Storage, StorageException, reraise as _reraise
 
 
 def reraise(exception):
@@ -28,6 +28,14 @@ class FileSystemStorage(Storage):
                 os.path.dirname(__file__)
             )
         self.folder_name = os.path.abspath(folder_name)
+
+    def list_folders(self):
+        if not self.folder_name:
+            raise StorageException('No folder given in class constructor.')
+        return filter(
+            lambda a: os.path.isdir(os.path.join(self.folder_name, a)),
+            os.listdir(self.folder_name)
+        )
 
     @property
     def location(self):
@@ -88,7 +96,7 @@ class FileSystemStorage(Storage):
         return os.path.exists(self.path(name))
 
     def path(self, name):
-        return os.path.normpath(safe_join(self.location, name))
+        return os.path.normpath(os.path.join(self.location, name))
 
     def url(self, name):
         return url_for('uploads.uploaded_file', filename=name)

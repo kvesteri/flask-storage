@@ -83,6 +83,13 @@ class TestFileSystemDeleteFolder(FileSystemTestCase):
             storage.delete_folder(self.rel_path)
 
 
+class TestFileSystemListFolders(FileSystemTestCase):
+    def test_returns_list_of_folders_on_success(self):
+        storage = FileSystemStorage(os.path.dirname(__file__))
+        storage.create_folder('uploads')
+        assert 'uploads' in storage.list_folders()
+
+
 class TestFileSystemOpen(FileSystemTestCase):
     def test_raises_exception_for_unknown_file(self):
         storage = FileSystemStorage(os.path.dirname(__file__))
