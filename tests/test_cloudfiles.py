@@ -5,6 +5,7 @@ import cloudfiles
 from tests import TestCase
 from flask_storage import (
     CloudFilesStorage,
+    CloudFilesStorageFile,
     StorageException
 )
 
@@ -56,6 +57,14 @@ class TestCloudFilesStorage(TestCase):
         self.storage = CloudFilesStorage()
         with raises(StorageException):
             self.storage.open('some_unknown_object')
+
+    def test_open_returns_file_object_on_success(self):
+        flexmock(cloudfiles).should_receive('get_connection') \
+            .and_return(MockConnection())
+        self.storage = CloudFilesStorage()
+        self.storage.save('key', 'something')
+        obj = self.storage.open('key')
+        assert isinstance(obj, CloudFilesStorageFile)
 
     def test_save_creates_new_object(self):
         flexmock(cloudfiles).should_receive('get_connection') \

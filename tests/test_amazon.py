@@ -92,6 +92,3 @@ class TestS3BotoStorageFile(TestCase):
 
         self.storage = S3BotoStorage('some_bucket')
         self.file = S3BotoStorageFile(self.storage, 'some_file')
-
-    def test_open_returns(self):
-        pass
