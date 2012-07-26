@@ -46,7 +46,7 @@ class MockStorage(Storage):
         Returns an absolute URL where the file's contents can be accessed
         directly by a Web browser.
         """
-        return 'url-' + name
+        return '/uploads/' + name
 
     def empty(self):
         self._files.clear()

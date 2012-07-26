@@ -21,7 +21,7 @@ class TestMockStorage(TestCase):
     def test_returns_file_url(self):
         storage = MockStorage()
         storage.save('key', 1)
-        assert storage.url('key') == 'url-key'
+        assert storage.url('key') == '/uploads/key'
 
     def test_open_returns_file_object(self):
         storage = MockStorage()
