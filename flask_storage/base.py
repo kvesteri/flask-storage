@@ -18,9 +18,9 @@ def reraise(exception):
         kwargs['status_code'] = exception.status
 
         if kwargs['status_code'] == 404:
-            raise FileNotFound(**kwargs)
+            raise FileNotFoundError(**kwargs)
         elif kwargs['status_code'] == 409:
-            raise FileExists(**kwargs)
+            raise FileExistsError(**kwargs)
 
     raise StorageException(**kwargs)
 
@@ -67,7 +67,7 @@ class StorageException(Exception):
         self.wrapped_exception = wrapped_exception
 
 
-class FileNotFound(StorageException):
+class FileNotFoundError(StorageException):
     pass
 
 
@@ -75,7 +75,7 @@ class ConflictError(StorageException):
     pass
 
 
-class FileExists(StorageException):
+class FileExistsError(StorageException):
     pass
 
 

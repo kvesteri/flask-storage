@@ -2,15 +2,25 @@ from .amazon import S3BotoStorage, S3BotoStorageFile
 from .cloudfiles import CloudFilesStorage, CloudFilesStorageFile
 from .filesystem import FileSystemStorage, FileSystemStorageFile
 from .mock import MockStorage, MockStorageFile
-from .base import Storage, StorageException
+from .base import (
+    FileExistsError,
+    FileNotFoundError,
+    PermissionError,
+    Storage,
+    StorageException,
+)
+
 
 __all__ = (
     CloudFilesStorage,
     CloudFilesStorageFile,
+    FileExistsError,
+    FileNotFoundError,
     FileSystemStorage,
     FileSystemStorageFile,
     MockStorage,
     MockStorageFile,
+    PermissionError,
     S3BotoStorage,
     S3BotoStorageFile,
     Storage,
