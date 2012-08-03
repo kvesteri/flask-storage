@@ -17,6 +17,11 @@ def reraise(exception):
     if hasattr(exception, 'status'):
         kwargs['status_code'] = exception.status
 
+        if kwargs['status_code'] == 404:
+            raise FileNotFound(**kwargs)
+        elif kwargs['status_code'] == 409:
+            raise FileExists(**kwargs)
+
     raise StorageException(**kwargs)
 
 
@@ -60,6 +65,22 @@ class StorageException(Exception):
         self.status_code = status_code
         self.message = message
         self.wrapped_exception = wrapped_exception
+
+
+class FileNotFound(StorageException):
+    pass
+
+
+class ConflictError(StorageException):
+    pass
+
+
+class FileExists(StorageException):
+    pass
+
+
+class PermissionError(StorageException):
+    pass
 
 
 class Storage(object):
