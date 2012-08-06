@@ -1,7 +1,7 @@
 from pytest import raises
 
 from tests import TestCase
-from flask_storage import MockStorage, MockStorageFile, StorageException
+from flask_storage import MockStorage, MockStorageFile, FileNotFoundError
 
 
 class TestMockStorage(TestCase):
@@ -29,9 +29,14 @@ class TestMockStorage(TestCase):
         file_ = storage.open('key')
         assert isinstance(file_, MockStorageFile)
 
+    def test_open_raises_excetion_for_unknown_file(self):
+        storage = MockStorage()
+        with raises(FileNotFoundError):
+            storage.open('key')
+
     def test_delete_raises_exception_for_unknown_file(self):
         storage = MockStorage()
-        with raises(StorageException):
+        with raises(FileNotFoundError):
             storage.delete('key')
 
 

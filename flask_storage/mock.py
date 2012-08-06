@@ -1,5 +1,5 @@
 import os
-from .base import Storage, StorageException
+from .base import Storage, FileNotFoundError
 
 
 class MockStorage(Storage):
@@ -32,7 +32,7 @@ class MockStorage(Storage):
         try:
             del self._files[name]
         except KeyError:
-            raise StorageException(404)
+            raise FileNotFoundError()
 
     def exists(self, name):
         """
@@ -55,7 +55,10 @@ class MockStorage(Storage):
 class MockStorageFile(object):
     def __init__(self, storage, name):
         self._name = name
-        self._file = storage._files[name]
+        try:
+            self._file = storage._files[name]
+        except KeyError:
+            raise FileNotFoundError()
         self._pos = 0
 
     @property
