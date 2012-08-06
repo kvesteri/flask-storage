@@ -116,6 +116,14 @@ class FileSystemStorageFile(object):
         self.decorated = file_
 
     @property
+    def last_modified(self):
+        return os.path.getmtime(self.url)
+
+    @property
+    def size(self):
+        return os.path.getsize(self.url)
+
+    @property
     def url(self):
         return self.decorated.name
 

@@ -211,6 +211,14 @@ class S3BotoStorageFile(StorageFile):
         self._pos = 0
 
     @property
+    def size(self):
+        return self._key.size
+
+    @property
+    def last_modified(self):
+        return self._key.last_modified
+
+    @property
     def url(self):
         return self._storage.url(self._key.name)
 
