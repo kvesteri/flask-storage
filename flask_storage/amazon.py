@@ -211,5 +211,9 @@ class S3BotoStorageFile(StorageFile):
         self._pos = 0
 
     @property
+    def url(self):
+        return self._storage.url(self._key.name)
+
+    @property
     def name(self):
         return self._key.name

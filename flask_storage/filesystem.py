@@ -112,8 +112,12 @@ class FileSystemStorage(Storage):
 
 
 class FileSystemStorageFile(object):
-    def __init__(self, file_):
+    def __init__(self, storage, file_):
         self.decorated = file_
+
+    @property
+    def url(self):
+        return self.decorated.name
 
     @property
     def name(self):
