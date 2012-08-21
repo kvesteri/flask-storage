@@ -21,13 +21,19 @@ class FileSystemStorage(Storage):
     Standard filesystem storage
     """
 
-    def __init__(self, folder_name=None):
+    def __init__(self, folder_name=None, file_view=None):
         if folder_name is None:
             folder_name = current_app.config.get(
                 'UPLOADS_FOLDER',
                 os.path.dirname(__file__)
             )
+        if file_view is None:
+            file_view = current_app.config.get(
+                'FILE_SYSTEM_STORAGE_FILE_VIEW',
+                'uploads.uploaded_file'
+            )
         self._folder_name = folder_name
+        self.file_view = file_view
         self._absolute_path = os.path.abspath(folder_name)
 
     @property
@@ -108,7 +114,7 @@ class FileSystemStorage(Storage):
         return os.path.normpath(os.path.join(self._absolute_path, name))
 
     def url(self, name):
-        return url_for('uploads.uploaded_file', filename=name)
+        return url_for(self.file_view, filename=name)
 
 
 class FileSystemStorageFile(object):

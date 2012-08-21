@@ -33,6 +33,11 @@ class TestFileSystemDefaults(FileSystemTestCase):
         storage = FileSystemStorage()
         assert self.rel_path in storage.folder_name
 
+    def test_if_file_view_not_set_uses_application_config_default(self):
+        self.app.config['FILE_SYSTEM_STORAGE_FILE_VIEW'] = 'custom.file_view'
+        storage = FileSystemStorage()
+        assert storage.file_view == 'custom.file_view'
+
 
 class TestFileSystemCreateFolder(FileSystemTestCase):
     def teardown_method(self, method):
