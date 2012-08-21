@@ -33,7 +33,7 @@ class FileSystemStorage(Storage):
                 'uploads.uploaded_file'
             )
         self._folder_name = folder_name
-        self.file_view = file_view
+        self._file_view = file_view
         self._absolute_path = os.path.abspath(folder_name)
 
     @property
@@ -114,7 +114,7 @@ class FileSystemStorage(Storage):
         return os.path.normpath(os.path.join(self._absolute_path, name))
 
     def url(self, name):
-        return url_for(self.file_view, filename=name)
+        return url_for(self._file_view, filename=name)
 
 
 class FileSystemStorageFile(object):

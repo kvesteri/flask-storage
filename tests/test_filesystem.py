@@ -1,6 +1,7 @@
 import os
 import shutil
 from pytest import raises
+from flexmock import flexmock
 
 from tests import TestCase
 from flask_storage import (
@@ -8,6 +9,7 @@ from flask_storage import (
     FileSystemStorageFile,
     StorageException
 )
+import flask_storage.filesystem
 
 
 class FileSystemTestCase(TestCase):
@@ -33,10 +35,17 @@ class TestFileSystemDefaults(FileSystemTestCase):
         storage = FileSystemStorage()
         assert self.rel_path in storage.folder_name
 
-    def test_if_file_view_not_set_uses_application_config_default(self):
+    def test_if_file_view_not_set_uses_application_config_value_as_view(self):
         self.app.config['FILE_SYSTEM_STORAGE_FILE_VIEW'] = 'custom.file_view'
         storage = FileSystemStorage()
-        assert storage.file_view == 'custom.file_view'
+        called_url_for = (
+            flexmock(flask_storage.filesystem)
+            .should_receive('url_for')
+            .once()
+            .with_args('custom.file_view', filename='file_name')
+        )
+        storage.url('file_name')
+        called_url_for.verify()
 
 
 class TestFileSystemCreateFolder(FileSystemTestCase):
