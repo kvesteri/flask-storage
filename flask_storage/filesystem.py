@@ -75,6 +75,7 @@ class FileSystemStorage(Storage):
                 io.write(content)
                 content = io
 
+            content.seek(0)
             try:
                 shutil.copyfileobj(content, destination, buffer_size)
             except OSError, e:
