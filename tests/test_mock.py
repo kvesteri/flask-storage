@@ -1,3 +1,4 @@
+from __future__ import with_statement
 from pytest import raises
 
 from tests import TestCase

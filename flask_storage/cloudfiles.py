@@ -92,7 +92,7 @@ class CloudFilesStorage(Storage):
         """
         try:
             self.container.delete_object(name)
-        except ResponseError as e:
+        except ResponseError, e:
             reraise(e)
 
     def exists(self, name):
@@ -116,9 +116,9 @@ class CloudFilesStorage(Storage):
     def get_object(self, name):
         try:
             return self.container.get_object(name)
-        except NoSuchObject as e:
+        except NoSuchObject, e:
             reraise(e)
-        except ResponseError as e:
+        except ResponseError, e:
             reraise(e)
 
 

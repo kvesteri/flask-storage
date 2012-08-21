@@ -118,7 +118,7 @@ class S3BotoStorage(Storage):
         try:
             bucket = self.connection.create_bucket(name)
             bucket.set_acl(self.bucket_acl)
-        except S3CreateError as e:
+        except S3CreateError, e:
             reraise(e)
         return bucket
 
