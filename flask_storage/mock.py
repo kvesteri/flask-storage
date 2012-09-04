@@ -12,7 +12,11 @@ class MockStorage(Storage):
         self.folder_name = folder_name
 
     def _save(self, name, content):
-        self._files[name] = str(content)
+        if isinstance(content, basestring):
+            self._files[name] = content
+        else:
+            content.seek(0)
+            self._files[name] = content.read()
         return name
 
     def _open(self, name, mode):
