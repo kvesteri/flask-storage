@@ -1,4 +1,5 @@
 from __future__ import with_statement
+from StringIO import StringIO
 from pytest import raises
 
 from tests import TestCase
@@ -16,17 +17,24 @@ class TestMockStorage(TestCase):
 
     def test_saves_key_value_pair_in_dict(self):
         storage = MockStorage()
-        storage.save('key', 1)
+        storage.save('key', '')
         assert storage.exists('key')
+
+    def test_reads_file_object_and_saves_in_dict(self):
+        storage = MockStorage()
+        io = StringIO()
+        io.write('file contents')
+        storage.save('key', io)
+        assert storage.open('key').read() == 'file contents'
 
     def test_returns_file_url(self):
         storage = MockStorage()
-        storage.save('key', 1)
+        storage.save('key', '')
         assert storage.url('key') == '/uploads/key'
 
     def test_open_returns_file_object(self):
         storage = MockStorage()
-        storage.save('key', 1)
+        storage.save('key', '')
         file_ = storage.open('key')
         assert isinstance(file_, MockStorageFile)
 
@@ -48,12 +56,12 @@ class TestMockStorageFile(TestCase):
 
     def test_size_returns_the_associated_file_size(self):
         storage = MockStorage('uploads')
-        storage.save('key', 123123)
+        storage.save('key', '123123')
         file_ = storage.open('key')
         assert file_.size == 6
 
     def test_read_returns_file_contents(self):
         storage = MockStorage('uploads')
-        storage.save('key', 123123)
+        storage.save('key', '123123')
         file_ = storage.open('key')
         assert file_.read() == '123123'
