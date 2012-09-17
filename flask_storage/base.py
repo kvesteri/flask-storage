@@ -1,7 +1,7 @@
 import os
 import itertools
 
-from werkzeug.utils import secure_filename
+# from werkzeug.utils import secure_filename
 
 
 __all__ = ('Storage')
@@ -103,7 +103,8 @@ class Storage(object):
         Saves new content to the file specified by name. The content should be
         a file-like object, ready to be read from the beginning.
         """
-        filename = os.path.normpath(secure_filename(os.path.basename(name)))
+        filename = os.path.normpath(name)
+
         if folder is not None:
             folder = os.path.normpath(folder)
             name = safe_join(folder, filename)

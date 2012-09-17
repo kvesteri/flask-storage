@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from .base import Storage, FileNotFoundError
 
 
@@ -64,6 +65,7 @@ class MockStorageFile(object):
         except KeyError:
             raise FileNotFoundError()
         self._pos = 0
+        self.last_modified = datetime.now()
 
     @property
     def size(self):

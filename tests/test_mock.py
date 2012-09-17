@@ -32,6 +32,11 @@ class TestMockStorage(TestCase):
         storage.save('key', '')
         assert storage.url('key') == '/uploads/key'
 
+    def test_supports_directories_in_file_names(self):
+        storage = MockStorage()
+        storage.save('some_dir/filename.txt', 'something')
+        assert storage.open('some_dir/filename.txt').read() == 'something'
+
     def test_open_returns_file_object(self):
         storage = MockStorage()
         storage.save('key', '')
