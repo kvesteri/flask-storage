@@ -164,7 +164,7 @@ class S3BotoStorage(Storage):
             policy=self.acl,
             reduced_redundancy=self.reduced_redundancy
         )
-        return cleaned_name
+        return self.open(encoded_name)
 
     def _open(self, name, mode='rb'):
         return S3BotoStorageFile(self, name)

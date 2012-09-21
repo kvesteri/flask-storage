@@ -18,7 +18,7 @@ class MockStorage(Storage):
         else:
             content.seek(0)
             self._files[name] = content.read()
-        return name
+        return self.open(name)
 
     def _open(self, name, mode):
         return MockStorageFile(self, name)
@@ -66,6 +66,10 @@ class MockStorageFile(object):
             raise FileNotFoundError()
         self._pos = 0
         self.last_modified = datetime.now()
+
+    @property
+    def name(self):
+        return self._name
 
     @property
     def size(self):

@@ -80,7 +80,7 @@ class FileSystemStorage(Storage):
                 shutil.copyfileobj(content, destination, buffer_size)
             except OSError, e:
                 reraise(e)
-        return name
+        return self.open(name)
 
     def open(self, name, mode='rb'):
         path = self.path(name)

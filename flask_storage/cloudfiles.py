@@ -81,7 +81,7 @@ class CloudFilesStorage(Storage):
         mimetype, _ = mimetypes.guess_type(name)
         cloud_obj.content_type = mimetype
         cloud_obj.send(content)
-        return name
+        return self.open(name)
 
     def _open(self, name, mode='rb'):
         return CloudFilesStorageFile(self, name)
