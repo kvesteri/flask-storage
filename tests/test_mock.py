@@ -64,6 +64,10 @@ class TestMockStorage(TestCase):
         with raises(FileNotFoundError):
             storage.delete('key')
 
+    def test_new_file(self):
+        storage = MockStorage()
+        assert isinstance(storage.new_file(), MockStorageFile)
+
 
 class TestMockStorageFile(TestCase):
     def setup_method(self, method):

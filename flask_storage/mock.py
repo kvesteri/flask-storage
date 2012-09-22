@@ -55,6 +55,10 @@ class MockStorage(Storage):
     def empty(self):
         self._files.clear()
 
+    @property
+    def file_class(self):
+        return MockStorageFile
+
 
 class MockStorageFile(StorageFile):
     def __init__(self, storage, name=None):

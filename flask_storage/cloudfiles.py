@@ -121,6 +121,10 @@ class CloudFilesStorage(Storage):
         except ResponseError, e:
             reraise(e)
 
+    @property
+    def file_class(self):
+        return CloudFilesStorageFile
+
 
 class CloudFilesStorageFile(StorageFile):
     def __init__(self, storage, name=None):

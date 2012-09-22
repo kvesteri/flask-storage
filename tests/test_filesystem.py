@@ -139,6 +139,10 @@ class TestFileSystemSave(FileSystemTestCase):
         obj = storage.save(self.file, 'value')
         assert obj.name == self.file
 
+    def test_new_file(self):
+        storage = FileSystemStorage(os.path.dirname(__file__))
+        assert isinstance(storage.new_file(), FileSystemStorageFile)
+
 
 class TestFileSystemDelete(FileSystemTestCase):
     def test_raises_exception_for_unknown_file(self):

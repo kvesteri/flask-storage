@@ -201,11 +201,16 @@ class S3BotoStorage(Storage):
             force_http=not self.secure_urls
         )
 
+    @property
+    def file_class(self):
+        return S3BotoStorageFile
+
 
 class S3BotoStorageFile(StorageFile):
     def __init__(self, storage, name=None):
         self._storage = storage
         self._key = Key(storage.bucket)
+        self._name = None
         self.name = name
         self._pos = 0
 

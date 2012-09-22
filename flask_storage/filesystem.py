@@ -118,10 +118,15 @@ class FileSystemStorage(Storage):
     def url(self, name):
         return url_for(self._file_view, filename=name)
 
+    @property
+    def file_class(self):
+        return FileSystemStorageFile
+
 
 class FileSystemStorageFile(object):
-    def __init__(self, storage, file_):
-        self.decorated = file_
+    def __init__(self, storage, file_=None):
+        if file_:
+            self.file = file_
 
     @property
     def last_modified(self):
@@ -133,11 +138,11 @@ class FileSystemStorageFile(object):
 
     @property
     def url(self):
-        return self.decorated.name
+        return self.file.name
 
     @property
     def name(self):
-        return os.path.basename(self.decorated.name)
+        return os.path.basename(self.file.name)
 
     def __getattr__(self, name):
-        return getattr(self.decorated, name)
+        return getattr(self.file, name)
