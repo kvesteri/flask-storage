@@ -98,20 +98,15 @@ class Storage(object):
     def _open(self, name, mode='rb'):
         raise NotImplementedError
 
-    def save(self, name, content, folder=None):
+    def save(self, name, content, overwrite=False):
         """
         Saves new content to the file specified by name. The content should be
         a file-like object, ready to be read from the beginning.
         """
-        filename = os.path.normpath(name)
+        name = os.path.normpath(name)
 
-        if folder is not None:
-            folder = os.path.normpath(folder)
-            name = safe_join(folder, filename)
-        else:
-            name = filename
-
-        name = self.get_available_name(name)
+        if not overwrite:
+            name = self.get_available_name(name)
         name = self._save(name, content)
 
         return name

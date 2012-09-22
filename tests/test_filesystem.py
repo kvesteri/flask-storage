@@ -22,12 +22,18 @@ class FileSystemTestCase(TestCase):
             'images'
         )
         self.rel_path = os.path.join('uploads', 'images')
+        self.storage = FileSystemStorage(os.path.dirname(__file__))
+        self.file = 'some_file.txt'
 
     def teardown_method(self, method):
         shutil.rmtree(os.path.join(
             os.path.dirname(__file__),
             'uploads'
         ), ignore_errors=True)
+        try:
+            self.storage.delete(self.file)
+        except StorageException:
+            pass
 
 
 class TestFileSystemDefaults(FileSystemTestCase):
@@ -116,18 +122,6 @@ class TestFileSystemListFiles(FileSystemTestCase):
 
 
 class TestFileSystemOpen(FileSystemTestCase):
-    def setup_method(self, method):
-        FileSystemTestCase.setup_method(self, method)
-        self.storage = FileSystemStorage(os.path.dirname(__file__))
-        self.file = 'some_file.txt'
-
-    def teardown_method(self, method):
-        FileSystemTestCase.teardown_method(self, method)
-        try:
-            self.storage.delete(self.file)
-        except StorageException:
-            pass
-
     def test_raises_exception_for_unknown_file(self):
         with raises(StorageException):
             self.storage.open('some_unknown_file', 'rb')
@@ -137,6 +131,13 @@ class TestFileSystemOpen(FileSystemTestCase):
         storage.save(self.file, 'something')
         file_ = storage.open(self.file, 'rb')
         assert isinstance(file_, FileSystemStorageFile)
+
+
+class TestFileSystemSave(FileSystemTestCase):
+    def test_returns_file_object_on_success(self):
+        storage = FileSystemStorage(os.path.dirname(__file__))
+        obj = storage.save(self.file, 'value')
+        assert obj.name == self.file
 
 
 class TestFileSystemDelete(FileSystemTestCase):

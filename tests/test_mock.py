@@ -20,6 +20,17 @@ class TestMockStorage(TestCase):
         storage.save('key', '')
         assert storage.exists('key')
 
+    def test_save_returns_file_object_on_success(self):
+        storage = MockStorage()
+        obj = storage.save('key', 'value')
+        assert obj.name == 'key'
+
+    def test_save_supports_overwrite(self):
+        storage = MockStorage()
+        storage.save('key', 'value')
+        storage.save('key', 'value 2', overwrite=True)
+        assert len(MockStorage._files) == 1
+
     def test_reads_file_object_and_saves_in_dict(self):
         storage = MockStorage()
         io = StringIO()
