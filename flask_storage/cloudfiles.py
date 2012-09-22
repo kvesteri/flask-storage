@@ -123,11 +123,25 @@ class CloudFilesStorage(Storage):
 
 
 class CloudFilesStorageFile(StorageFile):
-    def __init__(self, storage, name):
-        self._file = storage.get_object(name)
+    def __init__(self, storage, name=None):
+        self._storage = storage
         self._name = name
+        self._file = None
+        if self._name:
+            self.file
         self._pos = 0
+
+    @property
+    def file(self):
+        if not self._file:
+            self._file = self._storage.get_object(self.name)
+        return self._file
 
     @property
     def name(self):
         return self._name
+
+    @name.setter
+    def name(self, value):
+        self._file = None
+        self._name = value

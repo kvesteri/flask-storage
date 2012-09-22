@@ -41,35 +41,43 @@ class MockCloubObject(object):
         self.content = content
 
 
-class TestCloudFilesStorage(TestCase):
-    def setup_method(self, method):
-        TestCase.setup_method(self, method)
+def cloudfiles_mock_connection():
+    return (
+        flexmock(cloudfiles).should_receive('get_connection')
+        .and_return(MockConnection())
+    )
 
+
+class TestCloudFilesStorage(TestCase):
     def test_delete_raises_exception_for_unknown_file(self):
-        flexmock(cloudfiles).should_receive('get_connection') \
-            .and_return(MockConnection())
+        cloudfiles_mock_connection()
         self.storage = CloudFilesStorage()
         with raises(StorageException):
             self.storage.delete('key')
 
     def test_open_raises_exception_for_unknown_object(self):
-        flexmock(cloudfiles).should_receive('get_connection') \
-            .and_return(MockConnection())
+        cloudfiles_mock_connection()
         self.storage = CloudFilesStorage()
         with raises(StorageException):
             self.storage.open('some_unknown_object')
 
     def test_open_returns_file_object_on_success(self):
-        flexmock(cloudfiles).should_receive('get_connection') \
-            .and_return(MockConnection())
+        cloudfiles_mock_connection()
         self.storage = CloudFilesStorage()
         self.storage.save('key', 'something')
         obj = self.storage.open('key')
         assert isinstance(obj, CloudFilesStorageFile)
 
     def test_save_creates_new_object(self):
-        flexmock(cloudfiles).should_receive('get_connection') \
-            .and_return(MockConnection())
+        cloudfiles_mock_connection()
         self.storage = CloudFilesStorage()
         self.storage.save('key', 'something')
         self.storage.exists('key')
+
+
+class TestCloudFileStorageFile(TestCase):
+    def test_supports_file_objects_without_name(self):
+        cloudfiles_mock_connection()
+        storage = CloudFilesStorage()
+        file_ = CloudFilesStorageFile(storage)
+        assert bool(file_) is False

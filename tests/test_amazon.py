@@ -93,3 +93,7 @@ class TestS3BotoStorageFile(TestCase):
 
         self.storage = S3BotoStorage('some_bucket')
         self.file = S3BotoStorageFile(self.storage, 'some_file')
+
+    def test_supports_file_objects_without_name(self):
+        file_ = S3BotoStorageFile(self.storage)
+        assert bool(file_) is False

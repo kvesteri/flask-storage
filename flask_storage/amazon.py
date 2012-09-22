@@ -203,12 +203,15 @@ class S3BotoStorage(Storage):
 
 
 class S3BotoStorageFile(StorageFile):
-    def __init__(self, storage, name):
+    def __init__(self, storage, name=None):
         self._storage = storage
         self._key = Key(storage.bucket)
-        self._key.name = name
-        self._file = self._key
+        self.name = name
         self._pos = 0
+
+    @property
+    def file(self):
+        return self._key
 
     @property
     def size(self):
@@ -225,3 +228,8 @@ class S3BotoStorageFile(StorageFile):
     @property
     def name(self):
         return self._key.name
+
+    @name.setter
+    def name(self, value):
+        self._key.name = value
+        self._name = value

@@ -1,6 +1,5 @@
-import os
 from datetime import datetime
-from .base import Storage, FileNotFoundError
+from .base import Storage, StorageFile, FileNotFoundError
 
 
 class MockStorage(Storage):
@@ -57,13 +56,12 @@ class MockStorage(Storage):
         self._files.clear()
 
 
-class MockStorageFile(object):
-    def __init__(self, storage, name):
+class MockStorageFile(StorageFile):
+    def __init__(self, storage, name=None):
         self._name = name
-        try:
-            self._file = storage._files[name]
-        except KeyError:
-            raise FileNotFoundError()
+        self.storage = storage
+        if self._name:
+            self.file
         self._pos = 0
         self.last_modified = datetime.now()
 
@@ -72,26 +70,20 @@ class MockStorageFile(object):
         return self._name
 
     @property
+    def file(self):
+        try:
+            return self.storage._files[self._name]
+        except KeyError:
+            raise FileNotFoundError()
+
+    @property
     def size(self):
-        return len(self._file)
+        return len(self.file)
 
     def read(self, size=None):
         if self._pos == self.size:
             return ''
         size = min(size, self.size - self._pos)
-        data = self._file[self._pos:self.size]
+        data = self.file[self._pos:self.size]
         self._pos += len(data)
         return data
-
-    def seek(self, offset, whence=os.SEEK_SET):
-        if whence == os.SEEK_SET:
-            self._pos = offset
-        elif whence == os.SEEK_CUR:
-            self._pos += offset
-        elif whence == os.SEEK_END:
-            self._pos = self.size + offset
-        else:
-            raise IOError(22, 'Invalid argument')
-
-    def tell(self):
-        return self._pos

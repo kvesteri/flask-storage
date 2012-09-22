@@ -81,3 +81,8 @@ class TestMockStorageFile(TestCase):
         storage.save('key', '123123')
         file_ = storage.open('key')
         assert file_.read() == '123123'
+
+    def test_supports_file_objects_without_name(self):
+        storage = MockStorage('uploads')
+        file_ = MockStorageFile(storage)
+        assert bool(file_) is False

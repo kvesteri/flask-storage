@@ -217,6 +217,8 @@ class StorageFile(object):
     """
     Base class for driver file classes
     """
+    _name = None
+
     @property
     def url(self):
         return self._storage.url(self._key.name)
@@ -226,13 +228,13 @@ class StorageFile(object):
 
     @property
     def size(self):
-        return self._file.size
+        return self.file.size
 
     def read(self, size=None):
         if self._pos == self.size:
             return ''
         size = min(size, self.size - self._pos)
-        data = self._file.read(size=size or -1, offset=self._pos)
+        data = self.file.read(size=size or -1, offset=self._pos)
         self._pos += len(data)
         return data
 
@@ -248,3 +250,9 @@ class StorageFile(object):
 
     def tell(self):
         return self._pos
+
+    def __nonzero__(self):
+        return self._name is not None
+
+    def __bool__(self):
+        return self._name is not None
