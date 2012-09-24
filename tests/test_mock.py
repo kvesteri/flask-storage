@@ -90,3 +90,8 @@ class TestMockStorageFile(TestCase):
         storage = MockStorage('uploads')
         file_ = MockStorageFile(storage)
         assert bool(file_) is False
+
+    def test_returns_file_url(self):
+        storage = MockStorage('uploads')
+        file_ = storage.save('key', '123123')
+        assert file_.url == '/uploads/key'
