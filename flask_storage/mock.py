@@ -63,7 +63,7 @@ class MockStorage(Storage):
 class MockStorageFile(StorageFile):
     def __init__(self, storage, name=None):
         self._name = name
-        self.storage = storage
+        self._storage = storage
         if self._name:
             self.file
         self._pos = 0
@@ -76,7 +76,7 @@ class MockStorageFile(StorageFile):
     @property
     def file(self):
         try:
-            return self.storage._files[self._name]
+            return self._storage._files[self._name]
         except KeyError:
             raise FileNotFoundError()
 

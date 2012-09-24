@@ -224,10 +224,10 @@ class StorageFile(object):
 
     @property
     def url(self):
-        return self._storage.url(self._key.name)
+        return self._storage.url(self._name)
 
     def delete(self):
-        self._storage.delete(self._key.name)
+        self._storage.delete(self._name)
 
     @property
     def size(self):
