@@ -138,7 +138,7 @@ class FileSystemStorageFile(object):
 
     @property
     def url(self):
-        return url_for(self._file_view, filename=self.file.name)
+        return self._storage.url(self.file.name)
 
     @property
     def name(self):
