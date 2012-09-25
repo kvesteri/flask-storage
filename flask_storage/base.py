@@ -234,6 +234,10 @@ class StorageFile(object):
         self._storage.delete(self._name)
 
     @property
+    def storage(self):
+        return self._storage
+
+    @property
     def size(self):
         return self.file.size
 
@@ -257,13 +261,10 @@ class StorageFile(object):
             self.name = name
         if content:
             self.content = content
-        self.storage.save(name, content)
+        self._storage.save(name, content)
 
     def write(self, content):
-        self.storage.save(self.name, content)
-
-    def delete(self):
-        self.storage.delete(self.name)
+        self._storage.save(self.name, content)
 
     def read(self, size=None):
         if self._pos == self.size:

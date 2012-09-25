@@ -3,7 +3,9 @@ from StringIO import StringIO
 from pytest import raises
 
 from tests import TestCase
-from flask_storage import MockStorage, MockStorageFile, FileNotFoundError
+from flask_storage import (
+    MockStorage, MockStorageFile, StorageException, FileNotFoundError
+)
 
 
 class TestMockStorage(TestCase):
@@ -95,3 +97,16 @@ class TestMockStorageFile(TestCase):
         storage = MockStorage('uploads')
         file_ = storage.save('key', '123123')
         assert file_.url == '/uploads/key'
+
+    def test_supports_name_attribute(self):
+        storage = MockStorage('uploads')
+        file_ = MockStorageFile(storage)
+        file_.name = 'some_key'
+        assert file_.name == 'some_key'
+
+    def test_rename_throws_error(self):
+        storage = MockStorage('uploads')
+        file_ = MockStorageFile(storage)
+        file_.name = 'some_key'
+        with raises(StorageException):
+            file_.name = 'some_key2'
