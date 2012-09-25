@@ -216,8 +216,8 @@ class Storage(object):
         return unicode(name)
         #return force_unicode(name, encoding=self.file_name_charset)
 
-    def new_file(self):
-        return self.file_class(self)
+    def new_file(self, prefix=u''):
+        return self.file_class(self, prefix=prefix)
 
 
 class StorageFile(object):

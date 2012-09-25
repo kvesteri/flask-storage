@@ -70,6 +70,10 @@ class TestMockStorage(TestCase):
         storage = MockStorage()
         assert isinstance(storage.new_file(), MockStorageFile)
 
+    def test_new_file_supports_prefixes(self):
+        storage = MockStorage()
+        assert storage.new_file(prefix=u'pics').prefix == 'pics'
+
 
 class TestMockStorageFile(TestCase):
     def setup_method(self, method):
