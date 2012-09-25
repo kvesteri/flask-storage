@@ -20,7 +20,7 @@ class MockStorage(Storage):
         return self.open(name)
 
     def _open(self, name, mode):
-        return MockStorageFile(self, name)
+        return self.file_class(self, name)
 
     def path(self, name):
         """
@@ -62,21 +62,20 @@ class MockStorage(Storage):
 
 class MockStorageFile(StorageFile):
     def __init__(self, storage, name=None):
-        self._name = name
         self._storage = storage
-        if self._name:
+        if name is None:
+            self._name = name
+        else:
+            self.name = name
+        if self.name:
             self.file
         self._pos = 0
         self.last_modified = datetime.now()
 
     @property
-    def name(self):
-        return self._name
-
-    @property
     def file(self):
         try:
-            return self._storage._files[self._name]
+            return self._storage._files[self.name]
         except KeyError:
             raise FileNotFoundError()
 

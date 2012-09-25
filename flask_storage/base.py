@@ -83,6 +83,10 @@ class PermissionError(StorageException):
     pass
 
 
+class RenameError(StorageException):
+    pass
+
+
 class Storage(object):
     """
     A base storage class, providing some default behaviors that all other
@@ -232,6 +236,34 @@ class StorageFile(object):
     @property
     def size(self):
         return self.file.size
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, value):
+        if self._name:
+            raise StorageException(
+                "You can't rename files this way. Use rename method instead."
+            )
+        self._name = self._storage._clean_name(value)
+
+    def rename(self, name):
+        raise NotImplementedError
+
+    def save(self, name=None, content=None):
+        if name:
+            self.name = name
+        if content:
+            self.content = content
+        self.storage.save(name, content)
+
+    def write(self, content):
+        self.storage.save(self.name, content)
+
+    def delete(self):
+        self.storage.delete(self.name)
 
     def read(self, size=None):
         if self._pos == self.size:

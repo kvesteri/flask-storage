@@ -85,7 +85,7 @@ class FileSystemStorage(Storage):
     def open(self, name, mode='rb'):
         path = self.path(name)
         try:
-            return FileSystemStorageFile(self, open(path, mode))
+            return self.file_class(self, open(path, mode))
         except IOError, e:
             reraise(e)
 

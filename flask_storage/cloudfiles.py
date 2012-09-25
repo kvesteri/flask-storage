@@ -84,7 +84,7 @@ class CloudFilesStorage(Storage):
         return self.open(name)
 
     def _open(self, name, mode='rb'):
-        return CloudFilesStorageFile(self, name)
+        return self.file_class(self, name)
 
     def delete(self, name):
         """

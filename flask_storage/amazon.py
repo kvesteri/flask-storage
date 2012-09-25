@@ -109,7 +109,7 @@ class S3BotoStorage(Storage):
 
     def list_files(self):
         return [
-            S3BotoStorageFile(self, key.name) for key in self.bucket.list()
+            self.file_class(self, key.name) for key in self.bucket.list()
         ]
 
     def create_folder(self, name=None):
@@ -167,7 +167,7 @@ class S3BotoStorage(Storage):
         return self.open(encoded_name)
 
     def _open(self, name, mode='rb'):
-        return S3BotoStorageFile(self, name)
+        return self.file_class(self, name)
 
     def delete_folder(self, name=None):
         if name is None:
@@ -213,6 +213,14 @@ class S3BotoStorageFile(StorageFile):
         self._name = None
         self.name = name
         self._pos = 0
+
+    @property
+    def content_type(self):
+        return getattr(
+            self._key.content,
+            'content_type',
+            mimetypes.guess_type(self.name)[0] or Key.DefaultContentType
+        )
 
     @property
     def file(self):
