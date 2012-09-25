@@ -256,7 +256,7 @@ class StorageFile(object):
     def rename(self, name):
         raise NotImplementedError
 
-    def save(self, name=None, content=None):
+    def save(self, content, name=None):
         if name:
             self.name = name
         self._storage.save(self.name, content)
