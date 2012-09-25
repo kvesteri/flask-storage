@@ -5,7 +5,7 @@ import shutil
 import StringIO
 
 from flask import current_app, url_for
-from .base import Storage, StorageException, reraise as _reraise
+from .base import Storage, StorageFile, StorageException, reraise as _reraise
 
 
 def reraise(exception):
@@ -80,12 +80,14 @@ class FileSystemStorage(Storage):
                 shutil.copyfileobj(content, destination, buffer_size)
             except OSError, e:
                 reraise(e)
-        return self.open(name)
+        return self.file_class(self, name)
 
     def open(self, name, mode='rb'):
         path = self.path(name)
         try:
-            return self.file_class(self, open(path, mode))
+            file_ = self.file_class(self, path)
+            file_.file
+            return file_
         except IOError, e:
             reraise(e)
 
@@ -123,11 +125,24 @@ class FileSystemStorage(Storage):
         return FileSystemStorageFile
 
 
-class FileSystemStorageFile(object):
-    def __init__(self, storage, file_=None):
+class FileSystemStorageFile(StorageFile):
+    _file = None
+
+    def __init__(self, storage, name=None, prefix=u''):
         self._storage = storage
-        if file_:
-            self.file = file_
+        if name is not None:
+            self.name = name
+        self.prefix = prefix
+
+    @property
+    def file(self):
+        if not self._file:
+            self._file = open(self.fullname, 'rb')
+        return self._file
+
+    @property
+    def fullname(self):
+        return self.storage.path(self.name)
 
     @property
     def last_modified(self):
@@ -139,11 +154,7 @@ class FileSystemStorageFile(object):
 
     @property
     def url(self):
-        return self._storage.url(self.file.name)
-
-    @property
-    def name(self):
-        return os.path.basename(self.file.name)
+        return self._storage.url(self.name)
 
     def __getattr__(self, name):
         return getattr(self.file, name)

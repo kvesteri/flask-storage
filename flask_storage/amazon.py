@@ -207,11 +207,12 @@ class S3BotoStorage(Storage):
 
 
 class S3BotoStorageFile(StorageFile):
-    def __init__(self, storage, name=None):
+    def __init__(self, storage, name=None, prefix=u''):
         self._storage = storage
+        self.prefix = prefix
         self._key = Key(storage.bucket)
-        self._name = None
-        self.name = name
+        if name is not None:
+            self.name = name
         self._pos = 0
 
     @property
@@ -238,11 +239,11 @@ class S3BotoStorageFile(StorageFile):
     def url(self):
         return self._storage.url(self._key.name)
 
-    @property
-    def name(self):
-        return self._key.name
-
-    @name.setter
+    @StorageFile.name.setter
     def name(self, value):
         self._key.name = value
-        self._name = value
+        if self._name:
+            raise StorageException(
+                "You can't rename files this way. Use rename method instead."
+            )
+        self._name = self.prefix + self._storage._clean_name(value)

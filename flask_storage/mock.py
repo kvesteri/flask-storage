@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from .base import Storage, StorageFile, FileNotFoundError
 
@@ -8,7 +9,7 @@ class MockStorage(Storage):
     """
     _files = {}
 
-    def __init__(self, folder_name=None):
+    def __init__(self, folder_name=u''):
         self.folder_name = folder_name
 
     def _save(self, name, content):
@@ -50,7 +51,7 @@ class MockStorage(Storage):
         Returns an absolute URL where the file's contents can be accessed
         directly by a Web browser.
         """
-        return '/uploads/' + name
+        return os.path.join(self.folder_name, name)
 
     def empty(self):
         self._files.clear()
@@ -61,12 +62,13 @@ class MockStorage(Storage):
 
 
 class MockStorageFile(StorageFile):
-    def __init__(self, storage, name=None):
+    def __init__(self, storage, name=None, prefix=u''):
         self._storage = storage
-        if name is None:
-            self._name = name
-        else:
+        if name is not None:
             self.name = name
+
+        self.prefix = prefix
+
         if self.name:
             self.file
         self._pos = 0

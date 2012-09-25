@@ -225,6 +225,7 @@ class StorageFile(object):
     Base class for driver file classes
     """
     _name = None
+    prefix = u''
 
     @property
     def url(self):
@@ -251,7 +252,7 @@ class StorageFile(object):
             raise StorageException(
                 "You can't rename files this way. Use rename method instead."
             )
-        self._name = self._storage._clean_name(value)
+        self._name = self.prefix + self._storage._clean_name(value)
 
     def rename(self, name):
         raise NotImplementedError

@@ -149,3 +149,10 @@ class TestFileSystemDelete(FileSystemTestCase):
         storage = FileSystemStorage(os.path.dirname(__file__))
         with raises(StorageException):
             storage.delete('some_unknown_file')
+
+
+class TestFileSystemStorageFile(FileSystemTestCase):
+    def test_supports_prefixes(self):
+        file_ = FileSystemStorageFile(self.storage, prefix=u'pics/')
+        file_.name = 'some_pic.jpg'
+        assert file_.name == 'pics/some_pic.jpg'

@@ -97,3 +97,13 @@ class TestS3BotoStorageFile(TestCase):
     def test_supports_file_objects_without_name(self):
         file_ = S3BotoStorageFile(self.storage)
         assert bool(file_) is False
+
+    def test_supports_prefixes(self):
+        file_ = S3BotoStorageFile(self.storage, prefix=u'pics/')
+        file_.name = 'some_key'
+        assert file_.name == u'pics/some_key'
+
+    def test_supports_last_modified(self):
+        file_ = S3BotoStorageFile(self.storage, prefix=u'pics/')
+        file_.name = 'some_key'
+        file_.last_modified

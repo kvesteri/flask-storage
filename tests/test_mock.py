@@ -41,7 +41,7 @@ class TestMockStorage(TestCase):
         assert storage.open('key').read() == 'file contents'
 
     def test_returns_file_url(self):
-        storage = MockStorage()
+        storage = MockStorage('/uploads')
         storage.save('key', '')
         assert storage.url('key') == '/uploads/key'
 
@@ -75,6 +75,7 @@ class TestMockStorageFile(TestCase):
     def setup_method(self, method):
         TestCase.setup_method(self, method)
         MockStorage._files = {}
+        self.storage = MockStorage('/uploads')
 
     def test_size_returns_the_associated_file_size(self):
         storage = MockStorage('uploads')
@@ -94,7 +95,7 @@ class TestMockStorageFile(TestCase):
         assert bool(file_) is False
 
     def test_returns_file_url(self):
-        storage = MockStorage('uploads')
+        storage = MockStorage('/uploads')
         file_ = storage.save('key', '123123')
         assert file_.url == '/uploads/key'
 
@@ -112,8 +113,17 @@ class TestMockStorageFile(TestCase):
             file_.name = 'some_key2'
 
     def test_supports_save(self):
-        storage = MockStorage('uploads')
-        file_ = MockStorageFile(storage)
+        file_ = MockStorageFile(self.storage)
         file_.name = 'some_key'
         file_.save(content='something')
         assert file_.read() == 'something'
+
+    def test_supports_prefixes(self):
+        file_ = MockStorageFile(self.storage, prefix='pics/')
+        file_.name = 'some_key'
+        assert file_.name == 'pics/some_key'
+
+    def test_supports_last_modified(self):
+        file_ = MockStorageFile(self.storage, prefix=u'pics/')
+        file_.name = 'some_key'
+        file_.last_modified
