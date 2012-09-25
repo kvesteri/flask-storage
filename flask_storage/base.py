@@ -259,9 +259,7 @@ class StorageFile(object):
     def save(self, name=None, content=None):
         if name:
             self.name = name
-        if content:
-            self.content = content
-        self._storage.save(name, content)
+        self._storage.save(self.name, content)
 
     def write(self, content):
         self._storage.save(self.name, content)

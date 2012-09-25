@@ -110,3 +110,10 @@ class TestMockStorageFile(TestCase):
         file_.name = 'some_key'
         with raises(StorageException):
             file_.name = 'some_key2'
+
+    def test_supports_save(self):
+        storage = MockStorage('uploads')
+        file_ = MockStorageFile(storage)
+        file_.name = 'some_key'
+        file_.save(content='something')
+        assert file_.read() == 'something'
