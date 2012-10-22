@@ -149,7 +149,7 @@ class S3BotoStorage(Storage):
             'content_type',
             mimetypes.guess_type(name)[0] or Key.DefaultContentType
         )
-        content.name = cleaned_name
+        name = cleaned_name
         encoded_name = self._encode_name(name)
         key = self.bucket.get_key(encoded_name)
         if not key:
