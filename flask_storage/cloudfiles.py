@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 import mimetypes
 import cloudfiles
-from cloudfiles.errors import NoSuchObject, ResponseError
+from cloudfiles.errors import NoSuchObject, ResponseError, NoSuchContainer
 from flask import current_app
 from werkzeug.utils import cached_property
 
@@ -30,6 +30,8 @@ class CloudFilesStorage(Storage):
             'CLOUDFILES_TIMEOUT', 5)
         self.use_servicenet = current_app.config.get(
             'CLOUDFILES_SERVICENET', False)
+        self.auto_create_container = current_app.config.get(
+            'CLOUDFILES_AUTO_CREATE_CONTAINER', False)
 
     @property
     def folder_name(self):
@@ -51,8 +53,7 @@ class CloudFilesStorage(Storage):
     @property
     def container(self):
         if not hasattr(self, '_container'):
-            self._container = self.connection.get_container(
-                self.container_name)
+            self._container = self._get_or_create_container(self.container_name)
         return self._container
 
     @container.setter
@@ -71,6 +72,20 @@ class CloudFilesStorage(Storage):
         if self.container_name in container_uris:
             return container_uris[self.container_name]
         return self.container.public_ssl_uri()
+
+    def _get_or_create_container(self, name):
+        """Retrieves a bucket if it exists, otherwise creates it."""
+        if self.auto_create_container:
+            return self.connection.create_container(name)
+        else:
+            try:
+                return self.connection.get_container(name)
+            except NoSuchContainer:
+                raise RuntimeError(
+                    "Container specified by "
+                    "CLOUDFILES_BUCKET_NAME does not exist. "
+                    "Containers can be automatically created by setting "
+                    "CLOUDFILES_AUTO_CREATE_CONTAINER=True")
 
     def _save(self, name, content):
         """
