@@ -54,16 +54,9 @@ class CloudFilesStorage(Storage):
     def container(self):
         if not hasattr(self, '_container'):
             self._container = self._get_or_create_container(self.container_name)
+        if not self._container.is_public():
+            self._container.make_public()
         return self._container
-
-    @container.setter
-    def container(self, container):
-        """
-        Set the container, making it publicly available if it is not already.
-        """
-        if not container.is_public():
-            container.make_public()
-        self._container = container
 
     @cached_property
     def container_url(self):
