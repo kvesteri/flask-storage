@@ -3,7 +3,7 @@ from __future__ import absolute_import
 import mimetypes
 import cloudfiles
 from cloudfiles.errors import NoSuchObject, ResponseError, NoSuchContainer
-from flask import current_app
+from flask import current_app, request
 from werkzeug.utils import cached_property
 
 from .base import Storage, StorageFile, reraise
@@ -64,7 +64,10 @@ class CloudFilesStorage(Storage):
             'CLOUDFILES_CONTAINER_URIS', {})
         if self.container_name in container_uris:
             return container_uris[self.container_name]
-        return self.container.public_ssl_uri()
+        if request.is_secure:
+            return self.container.public_ssl_uri()
+        else:
+            return self.container.public_uri()
 
     def _get_or_create_container(self, name):
         """Retrieves a bucket if it exists, otherwise creates it."""
