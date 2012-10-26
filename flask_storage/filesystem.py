@@ -156,5 +156,5 @@ class FileSystemStorageFile(StorageFile):
     def url(self):
         return self._storage.url(self.name)
 
-    def __getattr__(self, name):
-        return getattr(self.file, name)
+    def tell(self):
+        return self.file.tell()

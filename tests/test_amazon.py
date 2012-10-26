@@ -7,6 +7,14 @@ from tests import TestCase
 from flask_storage import S3BotoStorage, S3BotoStorageFile, StorageException
 
 
+class MockKey(object):
+    def set_metadata(self, key, data):
+        pass
+
+    def set_contents_from_string(self, s, **kwargs):
+        pass
+
+
 class MockBucket(object):
     def set_acl(self, acl):
         pass
@@ -16,6 +24,9 @@ class MockBucket(object):
 
     def delete_key(self, key):
         pass
+
+    def new_key(self, key):
+        return MockKey()
 
     def list(self):
         return []
@@ -67,6 +78,16 @@ class TestS3BotoStorage(TestCase):
         )
         storage = S3BotoStorage('some bucket')
         assert storage.list_files() == []
+
+    def test_save_file_with_content_as_string(self):
+        mock_s3_connection()
+        (
+            flexmock(S3Connection)
+            .should_receive('get_bucket')
+            .and_return(MockBucket())
+        )
+        storage = S3BotoStorage('some bucket')
+        storage.save('some_file', 'some content')
 
 
 class TestS3BotoStorageOpenFile(TestCase):

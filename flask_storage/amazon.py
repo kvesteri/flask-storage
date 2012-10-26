@@ -144,26 +144,30 @@ class S3BotoStorage(Storage):
         cleaned_name = self._clean_name(name)
         name = self._normalize_name(cleaned_name)
         headers = self.headers.copy()
-        content_type = getattr(
-            content,
-            'content_type',
-            mimetypes.guess_type(name)[0] or Key.DefaultContentType
-        )
         name = cleaned_name
+        content_type = mimetypes.guess_type(name)[0] or Key.DefaultContentType
         encoded_name = self._encode_name(name)
-        key = self.bucket.get_key(encoded_name)
-        if not key:
-            key = self.bucket.new_key(encoded_name)
+
+        key = self.bucket.new_key(encoded_name)
         if self.preload_metadata:
             self._entries[encoded_name] = key
 
         key.set_metadata('Content-Type', content_type)
-        key.set_contents_from_file(
-            content,
-            headers=headers,
-            policy=self.acl,
-            reduced_redundancy=self.reduced_redundancy
-        )
+        if isinstance(name, basestring):
+            key.set_contents_from_string(
+                content,
+                headers=headers,
+                policy=self.acl,
+                reduced_redundancy=self.reduced_redundancy
+            )
+        else:
+            content.name = cleaned_name
+            key.set_contents_from_file(
+                content,
+                headers=headers,
+                policy=self.acl,
+                reduced_redundancy=self.reduced_redundancy
+            )
         return self.open(encoded_name)
 
     def _open(self, name, mode='rb'):
