@@ -83,9 +83,8 @@ class FileSystemStorage(Storage):
         return self.file_class(self, name)
 
     def open(self, name, mode='rb'):
-        path = self.path(name)
         try:
-            file_ = self.file_class(self, path)
+            file_ = self.file_class(self, name)
             file_.file
             return file_
         except IOError, e:
