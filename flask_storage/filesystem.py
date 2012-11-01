@@ -153,7 +153,7 @@ class FileSystemStorageFile(StorageFile):
 
     @property
     def url(self):
-        return self._storage.url(self.name)
+        return self.name
 
     def tell(self):
         return self.file.tell()
