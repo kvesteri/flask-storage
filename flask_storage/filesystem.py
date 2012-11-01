@@ -117,7 +117,7 @@ class FileSystemStorage(Storage):
         return os.path.normpath(os.path.join(self._absolute_path, name))
 
     def url(self, name):
-        return url_for(self._file_view, filename=name)
+        return os.path.join(self._absolute_path, name)
 
     @property
     def file_class(self):
