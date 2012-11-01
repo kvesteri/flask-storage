@@ -226,6 +226,7 @@ class StorageFile(object):
     """
     _name = None
     prefix = u''
+    _pos = 0
 
     @property
     def url(self):
