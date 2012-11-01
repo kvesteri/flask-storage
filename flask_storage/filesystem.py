@@ -116,9 +116,6 @@ class FileSystemStorage(Storage):
     def path(self, name):
         return os.path.normpath(os.path.join(self._absolute_path, name))
 
-    def fullname(self, name):
-        return os.path.join(self._absolute_path, name)
-
     def url(self, name):
         return url_for(self._file_view, name)
 
@@ -139,20 +136,20 @@ class FileSystemStorageFile(StorageFile):
     @property
     def file(self):
         if not self._file:
-            self._file = open(self.fullname, 'rb')
+            self._file = open(self.path, 'rb')
         return self._file
 
     @property
-    def fullname(self):
-        return self._storage.fullname(self.name)
+    def path(self):
+        return self._storage.path(self.name)
 
     @property
     def last_modified(self):
-        return os.path.getmtime(self.fullname)
+        return os.path.getmtime(self.path)
 
     @property
     def size(self):
-        return os.path.getsize(self.fullname)
+        return os.path.getsize(self.path)
 
     @property
     def url(self):
