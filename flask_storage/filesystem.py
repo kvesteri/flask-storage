@@ -120,7 +120,7 @@ class FileSystemStorage(Storage):
         return os.path.join(self._absolute_path, name)
 
     def url(self, name):
-        return os.path.join(self._absolute_path, name)
+        return url_for(self._file_view, name)
 
     @property
     def file_class(self):
@@ -156,7 +156,7 @@ class FileSystemStorageFile(StorageFile):
 
     @property
     def url(self):
-        return self.name
+        return self._storage.url(self.name)
 
     def tell(self):
         return self.file.tell()
