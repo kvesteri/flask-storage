@@ -211,7 +211,7 @@ class S3BotoStorage(Storage):
 
 
 class S3BotoStorageFile(StorageFile):
-    def __init__(self, storage, name=None, prefix=u''):
+    def __init__(self, storage, name=None, prefix=''):
         self._storage = storage
         self.prefix = prefix
         self._key = Key(storage.bucket)

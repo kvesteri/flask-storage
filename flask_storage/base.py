@@ -1,7 +1,8 @@
 import os
 import itertools
+from urlparse import urljoin
 
-# from werkzeug.utils import secure_filename
+from .utils import force_str, force_unicode
 
 
 __all__ = ('Storage')
@@ -38,11 +39,9 @@ def safe_join(base, *paths):
     Paths outside the base path indicate a possible security
     sensitive operation.
     """
-    from urlparse import urljoin
-    #base_path = force_unicode(base)
-    base_path = unicode(base)
+    base_path = force_unicode(base)
     base_path = base_path.rstrip('/')
-    paths = [unicode(p) for p in paths]
+    paths = [force_unicode(p) for p in paths]
 
     final_path = base_path
     for path in paths:
@@ -65,6 +64,9 @@ class StorageException(Exception):
         self.status_code = status_code
         self.message = message
         self.wrapped_exception = wrapped_exception
+
+    def __str__(self):
+        return self.message
 
 
 class FileNotFoundError(StorageException):
@@ -203,18 +205,17 @@ class Storage(object):
         work. We check to make sure that the path pointed to is not outside
         the directory specified by the LOCATION setting.
         """
+        return safe_join(self.location, name)
         try:
             return safe_join(self.location, name)
         except ValueError:
             raise StorageException("Attempted access to '%s' denied." % name)
 
     def _encode_name(self, name):
-        return str(name)
-        #return smart_str(name, encoding=self.file_name_charset)
+        return force_str(name, self.file_name_charset)
 
     def _decode_name(self, name):
-        return unicode(name)
-        #return force_unicode(name, encoding=self.file_name_charset)
+        return force_unicode(name, self.file_name_charset)
 
     def new_file(self, prefix=u''):
         return self.file_class(self, prefix=prefix)
