@@ -9,7 +9,7 @@ class MockStorage(Storage):
     """
     _files = {}
 
-    def __init__(self, folder_name=u''):
+    def __init__(self, folder_name=''):
         self.folder_name = folder_name
 
     def _save(self, name, content):
@@ -62,7 +62,7 @@ class MockStorage(Storage):
 
 
 class MockStorageFile(StorageFile):
-    def __init__(self, storage, name=None, prefix=u''):
+    def __init__(self, storage, name=None, prefix=''):
         self._storage = storage
         if name is not None:
             self.name = name

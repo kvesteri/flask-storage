@@ -72,7 +72,7 @@ class TestMockStorage(TestCase):
 
     def test_new_file_supports_prefixes(self):
         storage = MockStorage()
-        assert storage.new_file(prefix=u'pics').prefix == 'pics'
+        assert storage.new_file(prefix='pics').prefix == 'pics'
 
 
 class TestMockStorageFile(TestCase):

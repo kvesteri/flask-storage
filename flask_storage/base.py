@@ -217,7 +217,7 @@ class Storage(object):
     def _decode_name(self, name):
         return force_unicode(name, self.file_name_charset)
 
-    def new_file(self, prefix=u''):
+    def new_file(self, prefix=''):
         return self.file_class(self, prefix=prefix)
 
 
@@ -226,7 +226,7 @@ class StorageFile(object):
     Base class for driver file classes
     """
     _name = None
-    prefix = u''
+    prefix = ''
     _pos = 0
 
     @property

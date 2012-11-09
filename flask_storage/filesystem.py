@@ -127,7 +127,7 @@ class FileSystemStorage(Storage):
 class FileSystemStorageFile(StorageFile):
     _file = None
 
-    def __init__(self, storage, name=None, prefix=u''):
+    def __init__(self, storage, name=None, prefix=''):
         self._storage = storage
         if name is not None:
             self.name = name

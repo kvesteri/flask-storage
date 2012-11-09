@@ -153,6 +153,6 @@ class TestFileSystemDelete(FileSystemTestCase):
 
 class TestFileSystemStorageFile(FileSystemTestCase):
     def test_supports_prefixes(self):
-        file_ = FileSystemStorageFile(self.storage, prefix=u'pics/')
+        file_ = FileSystemStorageFile(self.storage, prefix='pics/')
         file_.name = 'some_pic.jpg'
         assert file_.name == 'pics/some_pic.jpg'

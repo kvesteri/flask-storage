@@ -129,7 +129,7 @@ class CloudFilesStorage(Storage):
 class CloudFilesStorageFile(StorageFile):
     _file = None
 
-    def __init__(self, storage, name=None, prefix=u''):
+    def __init__(self, storage, name=None, prefix=''):
         self._storage = storage
         self.prefix = prefix
         if name is not None:
