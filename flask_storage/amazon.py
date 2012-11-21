@@ -153,7 +153,7 @@ class S3BotoStorage(Storage):
             self._entries[encoded_name] = key
 
         key.set_metadata('Content-Type', content_type)
-        if isinstance(name, basestring):
+        if isinstance(content, basestring):
             key.set_contents_from_string(
                 content,
                 headers=headers,
