@@ -71,12 +71,12 @@ class CloudFilesStorage(Storage):
 
     def _get_or_create_container(self, name):
         """Retrieves a bucket if it exists, otherwise creates it."""
-        if self.auto_create_container:
-            return self.connection.create_container(name)
-        else:
-            try:
-                return self.connection.get_container(name)
-            except NoSuchContainer:
+        try:
+            return self.connection.get_container(name)
+        except NoSuchContainer:
+            if self.auto_create_container:
+                return self.connection.create_container(name)
+            else:
                 raise RuntimeError(
                     "Container specified by "
                     "CLOUDFILES_BUCKET_NAME does not exist. "
