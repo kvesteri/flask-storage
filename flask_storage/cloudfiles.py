@@ -2,8 +2,8 @@ from __future__ import absolute_import
 
 import mimetypes
 import cloudfiles
-from cloudfiles.errors import NoSuchObject, ResponseError
-from flask import current_app
+from cloudfiles.errors import NoSuchObject, ResponseError, NoSuchContainer
+from flask import current_app, request
 from werkzeug.utils import cached_property
 
 from .base import Storage, StorageFile, reraise
@@ -30,6 +30,8 @@ class CloudFilesStorage(Storage):
             'CLOUDFILES_TIMEOUT', 5)
         self.use_servicenet = current_app.config.get(
             'CLOUDFILES_SERVICENET', False)
+        self.auto_create_container = current_app.config.get(
+            'CLOUDFILES_AUTO_CREATE_CONTAINER', False)
 
     @property
     def folder_name(self):
@@ -51,18 +53,10 @@ class CloudFilesStorage(Storage):
     @property
     def container(self):
         if not hasattr(self, '_container'):
-            self._container = self.connection.get_container(
-                self.container_name)
+            self._container = self._get_or_create_container(self.container_name)
+        if not self._container.is_public():
+            self._container.make_public()
         return self._container
-
-    @container.setter
-    def container(self, container):
-        """
-        Set the container, making it publicly available if it is not already.
-        """
-        if not container.is_public():
-            container.make_public()
-        self._container = container
 
     @cached_property
     def container_url(self):
@@ -70,7 +64,24 @@ class CloudFilesStorage(Storage):
             'CLOUDFILES_CONTAINER_URIS', {})
         if self.container_name in container_uris:
             return container_uris[self.container_name]
-        return self.container.public_ssl_uri()
+        if request.is_secure:
+            return self.container.public_ssl_uri()
+        else:
+            return self.container.public_uri()
+
+    def _get_or_create_container(self, name):
+        """Retrieves a bucket if it exists, otherwise creates it."""
+        try:
+            return self.connection.get_container(name)
+        except NoSuchContainer:
+            if self.auto_create_container:
+                return self.connection.create_container(name)
+            else:
+                raise RuntimeError(
+                    "Container specified by "
+                    "CLOUDFILES_BUCKET_NAME does not exist. "
+                    "Containers can be automatically created by setting "
+                    "CLOUDFILES_AUTO_CREATE_CONTAINER=True")
 
     def _save(self, name, content):
         """
