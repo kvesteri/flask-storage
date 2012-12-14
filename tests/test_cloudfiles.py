@@ -25,6 +25,9 @@ class MockContainer(object):
             reason='some reason'
         )
 
+    def is_public(self):
+        return True
+
     def create_object(self, name):
         obj = MockCloubObject()
         self.objects[name] = obj
