@@ -32,6 +32,8 @@ class CloudFilesStorage(Storage):
             'CLOUDFILES_SERVICENET', False)
         self.auto_create_container = current_app.config.get(
             'CLOUDFILES_AUTO_CREATE_CONTAINER', False)
+        self.secure_uris = current_app.config.get(
+            'CLOUDFILES_SECURE_URIS', False)
 
     @property
     def folder_name(self):
@@ -64,7 +66,7 @@ class CloudFilesStorage(Storage):
             'CLOUDFILES_CONTAINER_URIS', {})
         if self.container_name in container_uris:
             return container_uris[self.container_name]
-        if request.is_secure:
+        if self.secure_uris or request.is_secure:
             return self.container.public_ssl_uri()
         else:
             return self.container.public_uri()
