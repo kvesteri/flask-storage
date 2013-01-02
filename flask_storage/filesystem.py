@@ -157,3 +157,9 @@ class FileSystemStorageFile(StorageFile):
 
     def tell(self):
         return self.file.tell()
+
+    def read(self, size=-1):
+        return self.file.read(size)
+
+    def seek(self, offset, whence=os.SEEK_SET):
+        self.file.seek(offset, whence)
