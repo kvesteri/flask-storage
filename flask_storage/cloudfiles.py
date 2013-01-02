@@ -156,3 +156,12 @@ class CloudFilesStorageFile(StorageFile):
         if not self._file:
             self._file = self._storage.get_object(self.name)
         return self._file
+
+    def read(self, size=-1, **kw):
+        kw.setdefault('offset', self._pos)
+        self.file.read(size, **kw)
+
+        if size < 0:
+            self._pos = self.size
+        else:
+            self._pos = self._pos + size

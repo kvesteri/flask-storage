@@ -85,10 +85,11 @@ class MockStorageFile(StorageFile):
     def size(self):
         return len(self.file)
 
-    def read(self, size=None):
-        if self._pos == self.size:
-            return ''
-        size = min(size, self.size - self._pos)
-        data = self.file[self._pos:self.size]
-        self._pos += len(data)
-        return data
+    def read(self, size=-1):
+        if size < 0:
+            size = self.size
+
+        start = self._pos
+        end = min(self.size, self._pos + size)
+        self._pos = end
+        return self.file[start:end]

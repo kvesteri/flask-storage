@@ -251,3 +251,15 @@ class S3BotoStorageFile(StorageFile):
                 "You can't rename files this way. Use rename method instead."
             )
         self._name = self.prefix + self._storage._clean_name(value)
+
+    def read(self, size=-1):
+        if size < 0:
+            size = self.size
+
+        start = self._pos
+        end = min(self.size, self._pos + size)
+        self._pos = end
+
+        # The Key object doesn't support offsets or seeking, so cut the
+        # beginning off manually.
+        return self.file.read(end)[start:]

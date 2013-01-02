@@ -268,12 +268,7 @@ class StorageFile(object):
         self._storage.save(self.name, content)
 
     def read(self, size=None):
-        if self._pos == self.size:
-            return ''
-        size = min(size, self.size - self._pos)
-        data = self.file.read(size=size or -1, offset=self._pos)
-        self._pos += len(data)
-        return data
+        raise NotImplemented
 
     def seek(self, offset, whence=os.SEEK_SET):
         if whence == os.SEEK_SET:
