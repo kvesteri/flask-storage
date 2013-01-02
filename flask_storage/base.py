@@ -268,7 +268,7 @@ class StorageFile(object):
         self._storage.save(self.name, content)
 
     def read(self, size=None):
-        raise NotImplemented
+        raise NotImplementedError
 
     def seek(self, offset, whence=os.SEEK_SET):
         if whence == os.SEEK_SET:
