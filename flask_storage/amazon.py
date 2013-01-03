@@ -268,3 +268,5 @@ class S3BotoStorageFile(StorageFile):
         # The Key object doesn't support offsets or seeking, so cut the
         # beginning off manually.
         return self.file.read(end)[start:]
+    def write(self, *args, **kw):
+        raise NotImplementedError
