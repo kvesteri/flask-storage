@@ -170,8 +170,8 @@ class S3BotoStorage(Storage):
             )
         return self.open(encoded_name)
 
-    def _open(self, name, mode='rb'):
-        return self.file_class(self, name)
+    def _open(self, name, mode='r'):
+        return self.file_class(self, name=name, mode=mode)
 
     def delete_folder(self, name=None):
         if name is None:
@@ -211,10 +211,14 @@ class S3BotoStorage(Storage):
 
 
 class S3BotoStorageFile(StorageFile):
-    def __init__(self, storage, name=None, prefix=''):
+    def __init__(self, storage, name=None, prefix='', mode='r'):
+        if mode == 'rb':
+            mode = 'r'  # rb is not supported
+
         self._storage = storage
         self.prefix = prefix
         self._key = Key(storage.bucket)
+        self._mode = mode
         if name is not None:
             self.name = name
         self._pos = 0
@@ -245,12 +249,13 @@ class S3BotoStorageFile(StorageFile):
 
     @StorageFile.name.setter
     def name(self, value):
-        self._key.name = value
         if self._name:
             raise StorageException(
                 "You can't rename files this way. Use rename method instead."
             )
         self._name = self.prefix + self._storage._clean_name(value)
+        self._key.name = self._name
+        self._key.open(self._mode)
 
     def read(self, size=-1):
         if size < 0:
