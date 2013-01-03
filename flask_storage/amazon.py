@@ -258,15 +258,10 @@ class S3BotoStorageFile(StorageFile):
         self._key.open(self._mode)
 
     def read(self, size=-1):
-        if size < 0:
-            size = self.size
+        return self.file.read(size)
 
-        start = self._pos
-        end = min(self.size, self._pos + size)
-        self._pos = end
+    def seek(self, *args, **kw):
+        raise NotImplementedError
 
-        # The Key object doesn't support offsets or seeking, so cut the
-        # beginning off manually.
-        return self.file.read(end)[start:]
     def write(self, *args, **kw):
         raise NotImplementedError
