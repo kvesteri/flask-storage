@@ -23,6 +23,9 @@ class MockKey(object):
     def open(self, *args, **kwargs):
         pass
 
+    def read(self, size=-1):
+        pass
+
     last_modified = datetime(1971, 1, 1)
 
 
@@ -144,3 +147,27 @@ class TestS3BotoStorageFile(TestCase):
         file_ = S3BotoStorageFile(self.storage, prefix='pics/')
         file_.name = 'some_key'
         file_.last_modified
+
+    def test_supports_reading(self):
+        mock_s3()
+        file_ = S3BotoStorageFile(self.storage, prefix='pics/')
+        file_.name = 'some_key'
+
+        (flexmock(MockKey)
+            .should_receive('read')
+            .once()
+            .with_args(341)
+            .and_return('test data!'))
+
+        assert file_.read(341) == 'test data!'
+
+    def test_opens_file_when_name_is_set(self):
+        mock_s3()
+        file_ = S3BotoStorageFile(self.storage, prefix='pics/', mode='pizza')
+
+        (flexmock(MockKey)
+            .should_receive('open')
+            .once()
+            .with_args('pizza'))
+
+        file_.name = 'some_key'
