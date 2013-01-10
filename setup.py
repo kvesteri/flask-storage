@@ -18,7 +18,7 @@ class PyTest(Command):
 
 setup(
     name='Flask-Storage',
-    version='0.1.1',
+    version='0.1.2',
     url='http://github.com/kvesteri/flask-storage',
     license='MIT',
     author='Konsta Vesterinen',
