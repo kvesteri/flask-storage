@@ -1,3 +1,4 @@
+from functools import wraps
 import mimetypes
 
 from boto.s3.connection import S3Connection, SubdomainCallingFormat
@@ -210,6 +211,16 @@ class S3BotoStorage(Storage):
         return S3BotoStorageFile
 
 
+def require_opening(func):
+    @wraps(func)
+    def wrapper(self, *args, **kwargs):
+        if not self._is_open:
+            self._key.open(self._mode)
+            self._is_open = True
+        return func(self, *args, **kwargs)
+    return wrapper
+
+
 class S3BotoStorageFile(StorageFile):
     def __init__(self, storage, name=None, prefix='', mode='r'):
         if mode == 'rb':
@@ -222,6 +233,7 @@ class S3BotoStorageFile(StorageFile):
         if name is not None:
             self.name = name
         self._pos = 0
+        self._is_open = False
 
     @property
     def content_type(self):
@@ -236,10 +248,12 @@ class S3BotoStorageFile(StorageFile):
         return self._key
 
     @property
+    @require_opening
     def size(self):
         return self._key.size
 
     @property
+    @require_opening
     def last_modified(self):
         return self._key.last_modified
 
@@ -255,8 +269,8 @@ class S3BotoStorageFile(StorageFile):
             )
         self._name = self.prefix + self._storage._clean_name(value)
         self._key.name = self._name
-        self._key.open(self._mode)
 
+    @require_opening
     def read(self, size=-1):
         return self.file.read(size)
 

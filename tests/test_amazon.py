@@ -27,6 +27,7 @@ class MockKey(object):
         pass
 
     last_modified = datetime(1971, 1, 1)
+    size = 0
 
 
 class MockBucket(object):
@@ -161,13 +162,25 @@ class TestS3BotoStorageFile(TestCase):
 
         assert file_.read(341) == 'test data!'
 
-    def test_opens_file_when_name_is_set(self):
+    def test_does_not_open_file_on_creation(self):
         mock_s3()
-        file_ = S3BotoStorageFile(self.storage, prefix='pics/', mode='pizza')
-
         (flexmock(MockKey)
             .should_receive('open')
-            .once()
-            .with_args('pizza'))
+            .never())
+        S3BotoStorageFile(self.storage, prefix='pics/')
 
-        file_.name = 'some_key'
+    def test_opens_file_on_size_access(self):
+        mock_s3()
+        (flexmock(MockKey)
+            .should_receive('open')
+            .once())
+        file_ = S3BotoStorageFile(self.storage, prefix='pics/')
+        file_.size
+
+    def test_opens_file_on_read(self):
+        mock_s3()
+        (flexmock(MockKey)
+            .should_receive('open')
+            .once())
+        file_ = S3BotoStorageFile(self.storage, prefix='pics/')
+        file_.read()
