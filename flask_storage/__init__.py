@@ -8,6 +8,7 @@ from .base import (
     PermissionError,
     Storage,
     StorageException,
+    StorageFile
 )
 
 
@@ -25,6 +26,7 @@ __all__ = (
     S3BotoStorageFile,
     Storage,
     StorageException,
+    StorageFile,
     'STORAGE_DRIVERS',
     'get_default_storage_class',
     'get_filesystem_storage_class',
