@@ -271,7 +271,7 @@ class S3BotoStorageFile(StorageFile):
         self._key.name = self._name
 
     @require_opening
-    def read(self, size=-1):
+    def read(self, size=0):
         return self.file.read(size)
 
     def seek(self, *args, **kw):
