@@ -220,6 +220,12 @@ class Storage(object):
     def new_file(self, prefix=''):
         return self.file_class(self, prefix=prefix)
 
+    def __eq__(self, other):
+        return self.folder_name == other.folder_name
+
+    def __ne__(self, other):
+        return not (self == other)
+
 
 class StorageFile(object):
     """
