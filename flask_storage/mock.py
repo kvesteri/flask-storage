@@ -74,6 +74,9 @@ class MockStorageFile(StorageFile):
         self._pos = 0
         self.last_modified = datetime.now()
 
+    def rename(self, name):
+        self._name = name
+
     @property
     def file(self):
         try:

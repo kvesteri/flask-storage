@@ -283,6 +283,15 @@ class StorageFile(object):
     def tell(self):
         return self._pos
 
+    def __eq__(self, other):
+        return (
+            self.storage == other.storage and
+            self.name == other.name
+        )
+
+    def __ne__(self, other):
+        return not (self == other)
+
     def __nonzero__(self):
         return self._name is not None
 

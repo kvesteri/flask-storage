@@ -131,3 +131,12 @@ class TestMockStorageFile(TestCase):
         file_ = MockStorageFile(self.storage, prefix=u'pics/')
         file_.name = 'some_key'
         file_.last_modified
+
+    def test_equality_operator(self):
+        file_ = MockStorageFile(self.storage)
+        file_.name = 'some_key'
+        file2 = MockStorageFile(self.storage)
+        file2.name = 'some_key'
+        assert file_ == file2
+        file2.rename('some other key')
+        assert file_ != file2
