@@ -221,10 +221,15 @@ class Storage(object):
         return self.file_class(self, prefix=prefix)
 
     def __eq__(self, other):
+        if not isinstance(other, Storage):
+            return NotImplemented
         return self.folder_name == other.folder_name
 
     def __ne__(self, other):
-        return not (self == other)
+        result = self.__eq__(other)
+        if result is NotImplemented:
+            return result
+        return not result
 
 
 class StorageFile(object):
@@ -290,13 +295,18 @@ class StorageFile(object):
         return self._pos
 
     def __eq__(self, other):
+        if not isinstance(other, StorageFile):
+            return NotImplemented
         return (
             self.storage == other.storage and
             self.name == other.name
         )
 
     def __ne__(self, other):
-        return not (self == other)
+        result = self.__eq__(other)
+        if result is NotImplemented:
+            return result
+        return not result
 
     def __nonzero__(self):
         return self._name is not None

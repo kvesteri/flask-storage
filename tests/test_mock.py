@@ -140,3 +140,10 @@ class TestMockStorageFile(TestCase):
         assert file_ == file2
         file2.rename('some other key')
         assert file_ != file2
+
+    def test_equality_operator_with_none_values(self):
+        file_ = MockStorageFile(self.storage)
+        file_.name = 'some_key'
+        none = None
+        assert not file_ == none
+        assert file_ != none
