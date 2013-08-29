@@ -61,7 +61,6 @@ def mock_s3():
 class TestS3BotoStorage(TestCase):
     def setup_method(self, method):
         TestCase.setup_method(self, method)
-        mock_s3()
         self.storage = S3BotoStorage()
 
     def test_assigns_folder_on_initialization(self):
@@ -70,6 +69,7 @@ class TestS3BotoStorage(TestCase):
         assert storage.folder_name == 'some bucket'
 
     def test_create_folder_tries_to_create_s3_bucket(self):
+        mock_s3()
         flexmock(S3Connection) \
             .should_receive('create_bucket') \
             .with_args('some_folder') \
@@ -124,7 +124,6 @@ class TestS3BotoStorageOpenFile(TestCase):
 class TestS3BotoStorageFile(TestCase):
     def setup_method(self, method):
         TestCase.setup_method(self, method)
-        mock_s3()
         flexmock(S3BotoStorage) \
             .should_receive('_get_or_create_bucket') \
             .with_args('some_bucket') \

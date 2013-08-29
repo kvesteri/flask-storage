@@ -39,11 +39,11 @@ class S3BotoStorage(Storage):
             file_overwrite=None,
             auto_create_bucket=None):
 
-        access_key = access_key or \
+        self.access_key = access_key or \
             current_app.config.get('AWS_ACCESS_KEY_ID', None)
-        secret_key = secret_key or \
+        self.secret_key = secret_key or \
             current_app.config.get('AWS_SECRET_ACCESS_KEY', None)
-        calling_format = calling_format or \
+        self.calling_format = calling_format or \
             current_app.config.get(
                 'AWS_S3_CALLING_FORMAT',
                 SubdomainCallingFormat()
@@ -87,11 +87,17 @@ class S3BotoStorage(Storage):
         self.file_name_charset = file_name_charset or \
             current_app.config.get('AWS_S3_FILE_NAME_CHARSET', 'utf-8')
 
-        self.connection = S3Connection(
-            access_key, secret_key,
-            calling_format=calling_format
-        )
+        self._connection = None
         self._entries = {}
+
+    @property
+    def connection(self):
+        if self._connection is None:
+            self._connection = S3Connection(
+                self.access_key, self.secret_key,
+                calling_format=self.calling_format
+            )
+        return self._connection
 
     @property
     def folder_name(self):
