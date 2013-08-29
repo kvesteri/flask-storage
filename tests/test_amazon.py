@@ -7,7 +7,7 @@ from boto.s3.connection import S3Connection
 from boto.s3.key import Key
 from boto.s3.bucket import Bucket
 from tests import TestCase
-from flask_storage import S3BotoStorage, S3BotoStorageFile, StorageException
+from flask_storage import S3BotoStorage, S3BotoStorageFile, FileNotFoundError
 
 
 class MockKey(object):
@@ -76,7 +76,7 @@ class TestS3BotoStorage(TestCase):
             .and_return(MockBucket())
         self.storage.create_folder('some_folder')
 
-    def test_delete_raises_exception_for_unknown_file(self):
+    def test_delete_raises_file_not_found_for_unknown_file(self):
         mock_s3()
         (
             flexmock(S3Connection)
@@ -84,7 +84,7 @@ class TestS3BotoStorage(TestCase):
             .and_return(MockBucket())
         )
         storage = S3BotoStorage('some bucket')
-        with raises(StorageException):
+        with raises(FileNotFoundError):
             storage.delete('key')
 
     def test_list_files_returns_list_of_key_names(self):

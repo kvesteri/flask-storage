@@ -7,7 +7,13 @@ from boto.s3.key import Key
 
 from flask import current_app
 
-from .base import Storage, StorageException, StorageFile, reraise
+from .base import (
+    FileNotFoundError,
+    Storage,
+    StorageException,
+    StorageFile,
+    reraise
+)
 
 
 class S3BotoStorage(Storage):
@@ -183,7 +189,7 @@ class S3BotoStorage(Storage):
         name = self._encode_name(self._normalize_name(self._clean_name(name)))
 
         if self.bucket.lookup(name) is None:
-            raise StorageException('%s already exists' % name, 404)
+            raise FileNotFoundError(name, 404)
 
         self.bucket.delete_key(name)
 
